@@ -1,0 +1,170 @@
+<!doctype html>
+<html class="no-js" lang="">
+
+<head>
+  <meta charset="utf-8">
+  <title></title>
+  <meta name="description" content="">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <meta property="og:title" content="">
+  <meta property="og:type" content="">
+  <meta property="og:url" content="">
+  <meta property="og:image" content="">
+  <link rel="stylesheet" href="css/normalize.css">
+  <link rel="stylesheet" href="css/main.css">
+  <script src="https://cdn.jsdelivr.net/npm/vue@2.7.14/dist/vue.js"></script>
+  <style>
+    html, body, container {
+      width: 100%;
+      height: 100%;
+    }
+
+    #container {
+      position: relative;
+    }
+
+    #bg {
+      width: 1920px;
+      height: 1080px;
+      /*border: solid red 5px;*/
+    }
+
+    @font-face {
+      font-family: DinkieBitmap-9px;
+      src: url("font/DinkieBitmap-9px.ttf");
+    }
+
+    @font-face {
+      font-family: crayon;
+      src: url("font/crayon_1-1.ttf");
+    }
+
+    @font-face {
+      font-family: HanyiSentyCrayon;
+      src: url("font/HanyiSentyCrayon.ttf");
+    }
+
+    @font-face {
+      font-family: HanyiSentyMeadow;
+      src: url("font/HanyiSentyMeadow.ttf");
+    }
+
+    #clock {
+      box-sizing: border-box;
+      height: 94px;
+      width: 176px;
+      color: #ffffc6;
+      text-shadow: 0 0 3px #d1312a, 0 0 3px #d1312a, 0 0 5px #d1312a, 0 0 5px #d1312a;
+      background-color: black;
+      /*border: solid green 2px;*/
+      position: absolute;
+      top: 189px;
+      left: 304px;
+      z-index: 999;
+      padding: 4px;
+      margin: 0;
+    }
+
+    #clock:hover {
+      display: none;
+    }
+
+    #blackboard {
+      box-sizing: border-box;
+      height: 298px;
+      width: 1136px;
+      /*text-shadow:0 0 0 ghostwhite;*/
+      position: absolute;
+      top: 311px;
+      left: 700px;
+      z-index: 999;
+      padding: 4px;
+      margin: 0;
+      text-align: center;
+      /*font-family: HanyiSentyCrayon;*/
+      font-family: HanyiSentyMeadow;
+      color: whitesmoke;
+      font-size: 3em;
+    }
+
+    #blackboard:hover {
+      display: none;
+    }
+
+    #blackboard > p {
+      width: 100%;
+      /*height: 100%;*/
+      display: inline-block;
+      margin: 0px;
+      padding: 0px;
+    }
+
+    #clock > p {
+      font-family: DinkieBitmap-9px;
+      text-align: center;
+      margin: 0px;
+      padding: 0px;
+      font-size: 20px;
+    }
+
+    /*#container {*/
+    /*  background-image: url("img/classroom_background.jpg");*/
+    /*  background-repeat: no-repeat;*/
+    /*}*/
+  </style>
+
+  <meta name="theme-color" content="#fafafa">
+</head>
+
+<body>
+<div id="container">
+  <img src="img/classroom_background.jpg" id="bg">
+  <div id="clock">
+    <p>{{date}}</p>
+    <p>{{day}}</p>
+    <p>{{time}}</p>
+  </div>
+  <div id="blackboard">
+    <p> 万里归来颜愈少，微笑，笑时犹带岭梅香。</p>
+    <p>试问岭南应不好，却道：此心安处是吾乡。</p>
+    <!--    <p> 十年生死两茫茫,不思量,forever young</p>-->
+  </div>
+</div>
+<audio controls="controls" loop="loop" autoplay="autoplay">
+  <source src="audio/南山南财大.mp3" type="audio/mpeg"/>
+</audio>
+<script src="js/main.js"></script>
+<script>
+  var clock = new Vue({
+    el: '#clock',
+    data: {
+      date: '2023年05月06日',
+      day: '星期六',
+      time: '17时00分',
+    }
+  });
+
+  var week = ['星期日', '星期一', '星期二', '星期三', '星期四', '星期五', '星期六'];
+  setInterval(updateTime, 1000);
+  updateTime();
+
+  function updateTime() {
+    var cd = new Date();
+    clock.time = zeroPadding(cd.getHours(), 2) + '时' + zeroPadding(cd.getMinutes(), 2) + '分' + zeroPadding(cd.getSeconds(), 2) + '秒';
+    clock.date = zeroPadding(cd.getFullYear(), 4) + '-' + zeroPadding(cd.getMonth() + 1, 2) + '-' + zeroPadding(cd.getDate(), 2);
+    clock.day = week[cd.getDay()];
+  };
+
+  function zeroPadding(num, digit) {
+    var zero = '';
+    for (var i = 0; i < digit; i++) {
+      zero += '0';
+    }
+    return (zero + num).slice(-digit);
+  }
+
+</script>
+<script src="https://www.google-analytics.com/analytics.js" async></script>
+</body>
+
+</html>
