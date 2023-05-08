@@ -109,6 +109,28 @@
       font-size: 20px;
     }
 
+    #person {
+      position: absolute;
+      width: 300px;
+      bottom: 0px;
+      /*left: 1300px;*/
+      -webkit-animation: linear infinite;
+      -webkit-animation-name: run;
+      -webkit-animation-duration: 200s;
+    }
+    @-webkit-keyframes run {
+      0% {
+        left: 0;
+      }
+      50% {
+        left: 1620px;
+        /*left: calc(100% - 100px);*/
+      }
+      100% {
+        left: 0;
+      }
+    }
+
     /*#container {*/
     /*  background-image: url("img/classroom_background.jpg");*/
     /*  background-repeat: no-repeat;*/
@@ -131,6 +153,7 @@
     <p>试问岭南应不好，却道：此心安处是吾乡。</p>
     <!--    <p> 十年生死两茫茫,不思量,forever young</p>-->
   </div>
+  <img src="img/noelle.png" id="person">
 </div>
 <audio controls="controls" loop="loop" autoplay="autoplay">
   <source src="audio/南山南财大.mp3" type="audio/mpeg"/>
