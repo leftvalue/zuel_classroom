@@ -117,6 +117,7 @@
       -webkit-animation: linear infinite;
       -webkit-animation-name: run;
       -webkit-animation-duration: 200s;
+      overflow:hidden;
     }
     @-webkit-keyframes run {
       0% {
@@ -129,6 +130,10 @@
       100% {
         left: 0;
       }
+    }
+    #person:hover{
+      transform: scale(1.6);
+      -webkit-transform-origin: bottom center 0;
     }
 
     /*#container {*/
