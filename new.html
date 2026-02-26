@@ -38,7 +38,7 @@
       height: 100vw;
       margin-top: -50vw;
       margin-left: -50vh;
-      overflow: hidden;
+      overflow: auto;
     }
 
     .rotated-wrapper #container {
@@ -49,7 +49,6 @@
     #wrapper {
       width: 100vw;
       height: 100vh;
-      overflow: auto;
     }
 
     #container {
@@ -379,9 +378,9 @@
     bg.style.width = imgWidth + 'px';
     bg.style.height = imgHeight + 'px';
 
-    // 设置容器尺寸 - 确保至少和视窗一样大，无留白
-    container.style.width = Math.max(imgWidth, containerWidth) + 'px';
-    container.style.height = Math.max(imgHeight, containerHeight) + 'px';
+    // 设置容器尺寸 - 使用图片计算后的尺寸，不进行额外的 max 计算以避免留白
+    container.style.width = imgWidth + 'px';
+    container.style.height = imgHeight + 'px';
 
     // 应用时钟位置和大小（左上角对齐，无偏移）
     clock.style.left = (ORIGINAL_CLOCK.left * currentScale) + 'px';
