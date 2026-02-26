@@ -1,0 +1,439 @@
+<!doctype html>
+<html class="no-js" lang="">
+
+<head>
+  <meta charset="utf-8">
+  <title></title>
+  <meta name="description" content="">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <meta property="og:title" content="">
+  <meta property="og:type" content="">
+  <meta property="og:url" content="">
+  <meta property="og:image" content="">
+  <link rel="stylesheet" href="css/normalize.css">
+  <link rel="stylesheet" href="css/main.css">
+  <script src="https://cdn.jsdelivr.net/npm/vue@2.7.14/dist/vue.js"></script>
+  <style>
+    * {
+      box-sizing: border-box;
+    }
+
+    html, body {
+      width: 100%;
+      height: 100%;
+      margin: 0;
+      padding: 0;
+      overflow: hidden;
+    }
+
+    #container {
+      position: relative;
+      width: 100%;
+      height: 100%;
+      overflow: hidden;
+    }
+
+    #bg {
+      position: absolute;
+      top: 0;
+      left: 0;
+      width: 100%;
+      height: 100%;
+      object-fit: cover;
+      object-position: center;
+    }
+
+    @font-face {
+      font-family: DinkieBitmap-9px;
+      src: url("font/DinkieBitmap-9px.ttf");
+    }
+
+    @font-face {
+      font-family: crayon;
+      src: url("font/crayon_1-1.ttf");
+    }
+
+    @font-face {
+      font-family: HanyiSentyCrayon;
+      src: url("font/HanyiSentyCrayon.ttf");
+    }
+
+    @font-face {
+      font-family: HanyiSentyMeadow;
+      src: url("font/HanyiSentyMeadow.ttf");
+    }
+
+    #clock {
+      box-sizing: border-box;
+      color: #ffffc6;
+      text-shadow: 0 0 3px #d1312a, 0 0 3px #d1312a, 0 0 5px #d1312a, 0 0 5px #d1312a;
+      background-color: black;
+      position: absolute;
+      z-index: 999;
+      padding: 4px;
+      margin: 0;
+      /* 初始值，会被 JS 覆盖 */
+      top: 189px;
+      left: 304px;
+      width: 176px;
+      height: 94px;
+    }
+
+    #clock:hover {
+      display: none;
+    }
+
+    #blackboard {
+      box-sizing: border-box;
+      height: 27.6vh;
+      width: 59.2vw;
+      position: absolute;
+      top: 28.8vh;
+      left: 36.5vw;
+      z-index: 999;
+      padding: 4px;
+      margin: 0;
+      text-align: center;
+      font-family: HanyiSentyMeadow;
+      color: whitesmoke;
+      font-size: 3em;
+      display: flex;
+      flex-direction: column;
+      justify-content: center;
+    }
+
+    #blackboard:hover {
+      display: none;
+    }
+
+    #person {
+      position: absolute;
+      width: 15.6vw;
+      min-width: 120px;
+      max-width: 300px;
+      bottom: 0px;
+      -webkit-animation: linear infinite;
+      -webkit-animation-name: run;
+      -webkit-animation-duration: 200s;
+      animation: linear infinite;
+      animation-name: run;
+      animation-duration: 200s;
+    }
+
+    #person:hover {
+      transform: scale(1.6);
+      -webkit-transform-origin: bottom center 0;
+    }
+
+    #audio-btn {
+      position: absolute;
+      bottom: 20px;
+      left: 20px;
+      z-index: 999;
+      width: 44px;
+      height: 44px;
+      border-radius: 50%;
+      background: rgba(0, 0, 0, 0.4);
+      border: 1px solid rgba(255, 255, 255, 0.3);
+      cursor: pointer;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      transition: background 0.3s;
+    }
+
+    #audio-btn:hover {
+      background: rgba(0, 0, 0, 0.6);
+    }
+
+    #audio-btn svg {
+      width: 20px;
+      height: 20px;
+      fill: rgba(255, 255, 255, 0.8);
+    }
+
+    #audio-btn.muted svg {
+      fill: rgba(255, 255, 255, 0.4);
+    }
+
+    @-webkit-keyframes run {
+      0% {
+        left: 0;
+      }
+      50% {
+        left: calc(100% - 15.6vw);
+      }
+      100% {
+        left: 0;
+      }
+    }
+
+    @keyframes run {
+      0% {
+        left: 0;
+      }
+      50% {
+        left: calc(100% - 15.6vw);
+      }
+      100% {
+        left: 0;
+      }
+    }
+
+    #blackboard > p {
+      width: 100%;
+      display: inline-block;
+      margin: 0px;
+      padding: 0px;
+    }
+
+    #clock > p {
+      font-family: DinkieBitmap-9px;
+      text-align: center;
+      margin: 0px;
+      padding: 0px;
+      font-size: 20px;
+      line-height: 1.3;
+    }
+
+    /* 响应式布局 - 平板 */
+    @media (max-width: 1024px) {
+      #blackboard {
+        font-size: 2.2em;
+        width: 65vw;
+        left: 30vw;
+      }
+    }
+
+    /* 响应式布局 - 手机 */
+    @media (max-width: 768px) {
+      #blackboard {
+        font-size: 1.6em;
+        width: 80vw;
+        left: 10vw;
+        top: 25vh;
+        height: 30vh;
+      }
+
+      #person {
+        width: 25vw;
+        min-width: 100px;
+      }
+
+      @-webkit-keyframes run {
+        0% {
+          left: 0;
+        }
+        50% {
+          left: calc(100% - 25vw);
+        }
+        100% {
+          left: 0;
+        }
+      }
+
+      @keyframes run {
+        0% {
+          left: 0;
+        }
+        50% {
+          left: calc(100% - 25vw);
+        }
+        100% {
+          left: 0;
+        }
+      }
+    }
+
+    /* 小屏幕手机 */
+    @media (max-width: 480px) {
+      #blackboard {
+        font-size: 1.2em;
+        width: 90vw;
+        left: 5vw;
+      }
+    }
+  </style>
+
+  <meta name="theme-color" content="#fafafa">
+</head>
+
+<body>
+<div id="container">
+  <img src="img/classroom_background.jpg" id="bg">
+  <div id="clock">
+    <p>{{date}}</p>
+    <p>{{day}}</p>
+    <p>{{time}}</p>
+  </div>
+  <div id="blackboard">
+    <p> 万里归来颜愈少，微笑，笑时犹带岭梅香。</p>
+    <p>试问岭南应不好，却道：此心安处是吾乡。</p>
+  </div>
+  <img src="img/noelle.png" id="person">
+  <button id="audio-btn" title="播放/暂停">
+    <svg viewBox="0 0 24 24" id="audio-icon">
+      <path d="M8 5v14l11-7z"/>
+    </svg>
+  </button>
+</div>
+<audio id="bgm" loop>
+  <source src="audio/南山南财大.mp3" type="audio/mpeg"/>
+</audio>
+<script>
+  // 音频自动播放和控制
+  const audioBtn = document.getElementById('audio-btn');
+  const audioIcon = document.getElementById('audio-icon');
+  const bgm = document.getElementById('bgm');
+
+  const playIcon = '<path d="M8 5v14l11-7z"/>';
+  const pauseIcon = '<path d="M6 19h4V5H6v14zm8-14v14h4V5h-4z"/>';
+  const mutedIcon = '<path d="M16.5 12c0-1.77-1.02-3.29-2.5-4.03v2.21l2.45 2.45c.03-.2.05-.41.05-.63zm2.5 0c0 .94-.2 1.82-.54 2.64l1.51 1.51C20.63 14.91 21 13.5 21 12c0-4.28-2.99-7.86-7-8.77v2.06c2.89.86 5 3.54 5 6.71zM4.27 3L3 4.27 7.73 9H3v6h4l5 5v-6.73l4.25 4.25c-.67.52-1.42.93-2.25 1.18v2.06c1.38-.31 2.63-.95 3.69-1.81L19.73 21 21 19.73 4.27 3zM12 4L9.91 6.09 12 8.18V4z"/>';
+
+  let isAutoplayBlocked = false;
+
+  function updateIcon() {
+    if (isAutoplayBlocked) {
+      // 自动播放被阻止，显示静音图标
+      audioIcon.innerHTML = mutedIcon;
+      audioBtn.classList.add('muted');
+    } else if (bgm.paused) {
+      // 已暂停，显示播放图标
+      audioIcon.innerHTML = playIcon;
+      audioBtn.classList.add('muted');
+    } else {
+      // 播放中，显示暂停图标
+      audioIcon.innerHTML = pauseIcon;
+      audioBtn.classList.remove('muted');
+    }
+  }
+
+  audioBtn.addEventListener('click', () => {
+    if (bgm.paused) {
+      bgm.play().then(() => {
+        updateIcon();
+      }).catch(() => {
+        // 浏览器阻止自动播放
+      });
+    } else {
+      bgm.pause();
+      updateIcon();
+    }
+  });
+
+  bgm.addEventListener('play', updateIcon);
+  bgm.addEventListener('pause', updateIcon);
+
+  // 尝试自动播放
+  function tryAutoplay() {
+    bgm.play().then(() => {
+      isAutoplayBlocked = false;
+      updateIcon();
+    }).catch(() => {
+      // 浏览器阻止自动播放
+      isAutoplayBlocked = true;
+      updateIcon();
+    });
+  }
+
+  // 页面加载后尝试自动播放
+  window.addEventListener('load', tryAutoplay);
+  // 用户首次交互后尝试播放
+  document.addEventListener('click', function onFirstClick() {
+    if (bgm.paused) {
+      bgm.play().then(() => {
+        isAutoplayBlocked = false;
+        updateIcon();
+      });
+    }
+    document.removeEventListener('click', onFirstClick);
+  }, { once: true });
+</script>
+<script src="js/main.js"></script>
+<script>
+  // 原始图片尺寸和时钟位置（基于 1920x1080）
+  const ORIGINAL_WIDTH = 1920;
+  const ORIGINAL_HEIGHT = 1080;
+  const ORIGINAL_CLOCK = {
+    top: 189,
+    left: 304,
+    width: 176,
+    height: 94,
+    fontSize: 20
+  };
+
+  // 根据图片实际渲染尺寸调整时钟
+  function adjustClockPosition() {
+    const bg = document.getElementById('bg');
+    const clock = document.getElementById('clock');
+    const clockTexts = clock.querySelectorAll('p');
+
+    // 获取图片实际渲染尺寸和位置
+    const imgRect = bg.getBoundingClientRect();
+
+    // 计算图片相对于原始尺寸的缩放比例
+    // 使用 cover 模式，图片会被裁剪，我们需要找到实际可见部分的缩放比例
+    const scaleX = imgRect.width / ORIGINAL_WIDTH;
+    const scaleY = imgRect.height / ORIGINAL_HEIGHT;
+
+    // 使用较大的缩放比例（cover 模式会裁剪较小的那边）
+    const scale = Math.max(scaleX, scaleY);
+
+    // 计算图片在容器中的偏移（因为 object-fit: cover 会居中）
+    const containerWidth = window.innerWidth;
+    const containerHeight = window.innerHeight;
+    const visibleImgWidth = ORIGINAL_WIDTH * scale;
+    const visibleImgHeight = ORIGINAL_HEIGHT * scale;
+    const offsetX = (containerWidth - visibleImgWidth) / 2;
+    const offsetY = (containerHeight - visibleImgHeight) / 2;
+
+    // 应用时钟位置和大小
+    clock.style.left = (offsetX + ORIGINAL_CLOCK.left * scale) + 'px';
+    clock.style.top = (offsetY + ORIGINAL_CLOCK.top * scale) + 'px';
+    clock.style.width = (ORIGINAL_CLOCK.width * scale) + 'px';
+    clock.style.height = (ORIGINAL_CLOCK.height * scale) + 'px';
+
+    // 调整字体大小
+    const newFontSize = ORIGINAL_CLOCK.fontSize * scale;
+    clockTexts.forEach(p => {
+      p.style.fontSize = newFontSize + 'px';
+    });
+  }
+
+  // Vue 时钟
+  var clock = new Vue({
+    el: '#clock',
+    data: {
+      date: '2023年05月06日',
+      day: '星期六',
+      time: '17时00分',
+    }
+  });
+
+  var week = ['星期日', '星期一', '星期二', '星期三', '星期四', '星期五', '星期六'];
+  setInterval(updateTime, 1000);
+  updateTime();
+
+  function updateTime() {
+    var cd = new Date();
+    clock.time = zeroPadding(cd.getHours(), 2) + '时' + zeroPadding(cd.getMinutes(), 2) + '分' + zeroPadding(cd.getSeconds(), 2) + '秒';
+    clock.date = zeroPadding(cd.getFullYear(), 4) + '-' + zeroPadding(cd.getMonth() + 1, 2) + '-' + zeroPadding(cd.getDate(), 2);
+    clock.day = week[cd.getDay()];
+  };
+
+  function zeroPadding(num, digit) {
+    var zero = '';
+    for (var i = 0; i < digit; i++) {
+      zero += '0';
+    }
+    return (zero + num).slice(-digit);
+  }
+
+  // 图片加载完成后和窗口调整时重新计算
+  window.addEventListener('load', adjustClockPosition);
+  window.addEventListener('resize', adjustClockPosition);
+</script>
+<script src="https://www.google-analytics.com/analytics.js" async></script>
+</body>
+
+</html>
