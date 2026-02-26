@@ -26,24 +26,21 @@
       overflow: hidden;
     }
 
-    /* 竖屏时旋转整个页面 */
-    @media (orientation: portrait) and (max-width: 768px) {
-      body {
-        transform: rotate(90deg);
-        transform-origin: center center;
-        width: 100vh;
-        height: 100vw;
-        position: fixed;
-        top: 50%;
-        left: 50%;
-        margin-top: -50vw;
-        margin-left: -50vh;
-      }
+    .rotated {
+      transform: rotate(90deg);
+      transform-origin: center center;
+      width: 100vh !important;
+      height: 100vw !important;
+      position: fixed !important;
+      top: 50% !important;
+      left: 50% !important;
+      margin-top: -50vw !important;
+      margin-left: -50vh !important;
+    }
 
-      #container {
-        width: 100vh;
-        height: 100vw;
-      }
+    .rotated #container {
+      width: 100vh !important;
+      height: 100vw !important;
     }
 
     #container {
@@ -452,6 +449,19 @@
   // 图片加载完成后和窗口调整时重新计算
   window.addEventListener('load', adjustClockPosition);
   window.addEventListener('resize', adjustClockPosition);
+
+  // 竖屏自动旋转
+  function checkOrientation() {
+    const isPortrait = window.innerHeight > window.innerWidth;
+    if (isPortrait) {
+      document.body.classList.add('rotated');
+    } else {
+      document.body.classList.remove('rotated');
+    }
+  }
+  window.addEventListener('resize', checkOrientation);
+  window.addEventListener('load', checkOrientation);
+  checkOrientation();
 </script>
 <script src="https://www.google-analytics.com/analytics.js" async></script>
 </body>
