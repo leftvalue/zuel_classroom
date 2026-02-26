@@ -139,10 +139,11 @@
     }
 
     #audio-btn {
-      position: absolute;
-      bottom: 20px;
+      position: fixed;
       left: 20px;
-      z-index: 999;
+      top: 50%;
+      transform: translateY(-50%);
+      z-index: 9999;
       width: 44px;
       height: 44px;
       border-radius: 50%;
@@ -229,13 +230,13 @@
       <p>试问岭南应不好，却道：此心安处是吾乡。</p>
     </div>
     <img src="img/noelle.png" id="person">
-    <button id="audio-btn" title="播放/暂停">
-      <svg viewBox="0 0 24 24" id="audio-icon">
-        <path d="M8 5v14l11-7z"/>
-      </svg>
-    </button>
   </div>
 </div>
+<button id="audio-btn" title="播放/暂停">
+  <svg viewBox="0 0 24 24" id="audio-icon">
+    <path d="M8 5v14l11-7z"/>
+  </svg>
+</button>
 <audio id="bgm" loop>
   <source src="audio/南山南财大.mp3" type="audio/mpeg"/>
 </audio>
