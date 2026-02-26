@@ -62,7 +62,8 @@
       position: absolute;
       top: 0;
       left: 0;
-      /* 尺寸由 JS 动态设置，保持原始比例 */
+      min-width: 100%;
+      min-height: 100%;
     }
 
     @font-face {
@@ -372,15 +373,15 @@
     const scaleY = containerHeight / ORIGINAL_HEIGHT;
     currentScale = Math.max(scaleX, scaleY);
 
-    // 应用图片尺寸
+    // 应用图片尺寸 - cover 模式：以长边为准，填满视窗
     const imgWidth = ORIGINAL_WIDTH * currentScale;
     const imgHeight = ORIGINAL_HEIGHT * currentScale;
     bg.style.width = imgWidth + 'px';
     bg.style.height = imgHeight + 'px';
 
-    // 设置容器尺寸与图片一致（因为 bg 是绝对定位，不会撑开容器）
-    container.style.width = imgWidth + 'px';
-    container.style.height = imgHeight + 'px';
+    // 设置容器尺寸 - 确保至少和视窗一样大，无留白
+    container.style.width = Math.max(imgWidth, containerWidth) + 'px';
+    container.style.height = Math.max(imgHeight, containerHeight) + 'px';
 
     // 应用时钟位置和大小（左上角对齐，无偏移）
     clock.style.left = (ORIGINAL_CLOCK.left * currentScale) + 'px';
