@@ -89,7 +89,7 @@
       box-sizing: border-box;
       color: #ffffc6;
       text-shadow: 0 0 3px #d1312a, 0 0 3px #d1312a, 0 0 5px #d1312a, 0 0 5px #d1312a;
-      background-color: rgba(0, 0, 0, 0.8);
+      background-color: black;
       position: absolute;
       z-index: 999;
       padding: 4px;
@@ -99,7 +99,6 @@
       left: 304px;
       width: 176px;
       height: 94px;
-      border: 1px solid red; /* 调试用，显示时钟边界 */
     }
 
     #clock:hover {
@@ -377,6 +376,10 @@
     const imgHeight = ORIGINAL_HEIGHT * currentScale;
     bg.style.width = imgWidth + 'px';
     bg.style.height = imgHeight + 'px';
+
+    // 设置容器尺寸与图片一致（因为 bg 是绝对定位，不会撑开容器）
+    container.style.width = imgWidth + 'px';
+    container.style.height = imgHeight + 'px';
 
     // 应用时钟位置和大小（左上角对齐，无偏移）
     clock.style.left = (ORIGINAL_CLOCK.left * currentScale) + 'px';
