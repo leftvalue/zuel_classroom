@@ -46,22 +46,23 @@
       height: 100%;
     }
 
-    #container {
-      position: relative;
+    #wrapper {
       width: 100vw;
       height: 100vh;
       overflow: auto;
+    }
+
+    #container {
+      position: relative;
+      /* 尺寸由 JS 动态设置 */
+      display: inline-block;
     }
 
     #bg {
       position: absolute;
       top: 0;
       left: 0;
-      /* 以短边为准保持比例缩放 */
-      min-width: 100vw;
-      min-height: 100vh;
-      width: auto;
-      height: auto;
+      /* 尺寸由 JS 动态设置，保持原始比例 */
     }
 
     @font-face {
@@ -88,7 +89,7 @@
       box-sizing: border-box;
       color: #ffffc6;
       text-shadow: 0 0 3px #d1312a, 0 0 3px #d1312a, 0 0 5px #d1312a, 0 0 5px #d1312a;
-      background-color: black;
+      background-color: rgba(0, 0, 0, 0.8);
       position: absolute;
       z-index: 999;
       padding: 4px;
@@ -98,6 +99,7 @@
       left: 304px;
       width: 176px;
       height: 94px;
+      border: 1px solid red; /* 调试用，显示时钟边界 */
     }
 
     #clock:hover {
@@ -349,9 +351,21 @@
     const person = document.getElementById('person');
     const container = document.getElementById('container');
 
-    // 直接使用容器的实际尺寸（CSS 已经处理好了旋转后的尺寸）
-    const containerWidth = container.clientWidth;
-    const containerHeight = container.clientHeight;
+    // 使用 window 尺寸计算，避免滚动条影响
+    // 在旋转模式下，CSS 已经交换了宽高，这里直接使用即可
+    let containerWidth = window.innerWidth;
+    let containerHeight = window.innerHeight;
+
+    // 竖屏旋转时，视觉上的宽高与 window 相反，但 CSS 已经处理了，所以这里直接用 window 尺寸
+    // 实际上，我们需要的是未旋转前的逻辑尺寸
+    const wrapper = document.getElementById('wrapper');
+    const isRotated = wrapper.classList.contains('rotated-wrapper');
+    if (isRotated) {
+      // 旋转后，视觉宽 = window.innerHeight，视觉高 = window.innerWidth
+      // 但我们要以视觉上的短边为准
+      containerWidth = window.innerHeight;
+      containerHeight = window.innerWidth;
+    }
 
     // 计算缩放比例：以短边为准
     const scaleX = containerWidth / ORIGINAL_WIDTH;
