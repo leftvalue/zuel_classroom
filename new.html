@@ -450,10 +450,6 @@
     return (zero + num).slice(-digit);
   }
 
-  // 图片加载完成后和窗口调整时重新计算
-  window.addEventListener('load', adjustLayout);
-  window.addEventListener('resize', adjustLayout);
-
   // 竖屏自动旋转 - 通过 wrapper 实现，避免重绘
   function checkOrientation() {
     const wrapper = document.getElementById('wrapper');
@@ -463,10 +459,11 @@
     } else {
       wrapper.classList.remove('rotated-wrapper');
     }
+    // 旋转后立即重新计算布局
+    adjustLayout();
   }
   window.addEventListener('resize', checkOrientation);
   window.addEventListener('load', checkOrientation);
-  checkOrientation();
 </script>
 <script src="https://www.google-analytics.com/analytics.js" async></script>
 </body>
