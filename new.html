@@ -26,29 +26,23 @@
       overflow: hidden;
     }
 
-    /* 竖屏旋转容器而非body，避免大小重计算 */
-    .rotated-wrapper {
+    #wrapper {
+      width: 100vw;
+      height: 100vh;
+      overflow: auto;
+    }
+
+    /* 竖屏时旋转显示 */
+    .rotated #wrapper {
       transform: rotate(90deg);
       transform-origin: center center;
       position: fixed;
       top: 50%;
       left: 50%;
-      /* 交换宽高 */
       width: 100vh;
       height: 100vw;
       margin-top: -50vw;
       margin-left: -50vh;
-      overflow: auto;
-    }
-
-    .rotated-wrapper #container {
-      width: 100%;
-      height: 100%;
-    }
-
-    #wrapper {
-      width: 100vw;
-      height: 100vh;
     }
 
     #container {
@@ -342,7 +336,7 @@
 
   let currentScale = 1;
 
-  // 根据容器尺寸调整所有元素 - 以短边为准保持比例
+  // 根据容器尺寸调整所有元素
   function adjustLayout() {
     const bg = document.getElementById('bg');
     const clock = document.getElementById('clock');
@@ -351,38 +345,26 @@
     const person = document.getElementById('person');
     const container = document.getElementById('container');
 
-    // 使用 window 尺寸计算，避免滚动条影响
-    // 在旋转模式下，CSS 已经交换了宽高，这里直接使用即可
-    let containerWidth = window.innerWidth;
-    let containerHeight = window.innerHeight;
+    // 直接使用 window 尺寸
+    const viewWidth = window.innerWidth;
+    const viewHeight = window.innerHeight;
 
-    // 竖屏旋转时，视觉上的宽高与 window 相反，但 CSS 已经处理了，所以这里直接用 window 尺寸
-    // 实际上，我们需要的是未旋转前的逻辑尺寸
-    const wrapper = document.getElementById('wrapper');
-    const isRotated = wrapper.classList.contains('rotated-wrapper');
-    if (isRotated) {
-      // 旋转后，视觉宽 = window.innerHeight，视觉高 = window.innerWidth
-      // 但我们要以视觉上的短边为准
-      containerWidth = window.innerHeight;
-      containerHeight = window.innerWidth;
-    }
-
-    // 计算缩放比例：以长边为准（cover 模式，填满视窗）
-    const scaleX = containerWidth / ORIGINAL_WIDTH;
-    const scaleY = containerHeight / ORIGINAL_HEIGHT;
+    // 计算缩放比例：确保图片填满整个视窗（cover 模式）
+    const scaleX = viewWidth / ORIGINAL_WIDTH;
+    const scaleY = viewHeight / ORIGINAL_HEIGHT;
     currentScale = Math.max(scaleX, scaleY);
 
-    // 应用图片尺寸 - cover 模式：以长边为准，填满视窗
+    // 应用图片尺寸
     const imgWidth = ORIGINAL_WIDTH * currentScale;
     const imgHeight = ORIGINAL_HEIGHT * currentScale;
     bg.style.width = imgWidth + 'px';
     bg.style.height = imgHeight + 'px';
 
-    // 设置容器尺寸 - 使用图片计算后的尺寸，不进行额外的 max 计算以避免留白
+    // 设置容器尺寸
     container.style.width = imgWidth + 'px';
     container.style.height = imgHeight + 'px';
 
-    // 应用时钟位置和大小（左上角对齐，无偏移）
+    // 应用时钟位置和大小
     clock.style.left = (ORIGINAL_CLOCK.left * currentScale) + 'px';
     clock.style.top = (ORIGINAL_CLOCK.top * currentScale) + 'px';
     clock.style.width = (ORIGINAL_CLOCK.width * currentScale) + 'px';
@@ -399,7 +381,7 @@
     blackboard.style.top = (ORIGINAL_BLACKBOARD.top * currentScale) + 'px';
     blackboard.style.width = (ORIGINAL_BLACKBOARD.width * currentScale) + 'px';
     blackboard.style.height = (ORIGINAL_BLACKBOARD.height * currentScale) + 'px';
-    blackboard.style.fontSize = (48 * currentScale) + 'px'; // 3em ≈ 48px
+    blackboard.style.fontSize = (48 * currentScale) + 'px';
 
     // 应用人物大小
     person.style.width = (ORIGINAL_PERSON.width * currentScale) + 'px';
@@ -464,16 +446,18 @@
     return (zero + num).slice(-digit);
   }
 
-  // 竖屏自动旋转 - 通过 wrapper 实现，避免重绘
+  // 窗口变化时重新计算布局
+  window.addEventListener('resize', adjustLayout);
+  window.addEventListener('load', adjustLayout);
+
+  // 检测方向，竖屏时旋转
   function checkOrientation() {
-    const wrapper = document.getElementById('wrapper');
     const isPortrait = window.innerHeight > window.innerWidth;
     if (isPortrait) {
-      wrapper.classList.add('rotated-wrapper');
+      document.body.classList.add('rotated');
     } else {
-      wrapper.classList.remove('rotated-wrapper');
+      document.body.classList.remove('rotated');
     }
-    // 旋转后立即重新计算布局
     adjustLayout();
   }
   window.addEventListener('resize', checkOrientation);
