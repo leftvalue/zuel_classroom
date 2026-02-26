@@ -367,10 +367,10 @@
       containerHeight = window.innerWidth;
     }
 
-    // 计算缩放比例：以短边为准
+    // 计算缩放比例：以长边为准（cover 模式，填满视窗）
     const scaleX = containerWidth / ORIGINAL_WIDTH;
     const scaleY = containerHeight / ORIGINAL_HEIGHT;
-    currentScale = Math.min(scaleX, scaleY);
+    currentScale = Math.max(scaleX, scaleY);
 
     // 应用图片尺寸
     const imgWidth = ORIGINAL_WIDTH * currentScale;
