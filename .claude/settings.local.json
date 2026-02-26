@@ -1,0 +1,14 @@
+{
+  "permissions": {
+    "allow": [
+      "Bash(git add new.html && git commit -m \"修复人物层级：添加 z-index 确保显示在最前\" && git push)",
+      "Bash(git add new.html && git commit -m \"改为 cover 模式：以长边为准缩放，图片填满视窗无留白\" && git push)",
+      "Bash(git add new.html && git commit -m \"确保图片填满视窗：添加 min-width/height 并修正容器尺寸\" && git push)",
+      "Bash(git add new.html && git commit -m \"修复竖屏留白：修正旋转容器 overflow 和尺寸计算\" && git push)",
+      "Bash(git add new.html && git commit -m \"重新添加竖屏旋转功能\" && git push)",
+      "Bash(git add new.html && git commit -m \"修复桌面端无法拖动：移除 body overflow hidden\" && git push)",
+      "Bash(git add new.html && git commit -m \"修复拖动：移除 bg 绝对定位，让 container 正确撑开\" && git push)",
+      "Bash(git add new.html && git commit -m \"音频按钮改为 fixed 定位，固定在视窗左边中间\" && git push)"
+    ]
+  }
+}
