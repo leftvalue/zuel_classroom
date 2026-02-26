@@ -347,19 +347,15 @@
     const clockTexts = clock.querySelectorAll('p');
     const blackboard = document.getElementById('blackboard');
     const person = document.getElementById('person');
-    const wrapper = document.getElementById('wrapper');
-    const isRotated = wrapper.classList.contains('rotated-wrapper');
+    const container = document.getElementById('container');
 
-    // 获取可视区域尺寸（旋转后需要交换）
-    let viewWidth = window.innerWidth;
-    let viewHeight = window.innerHeight;
-    if (isRotated) {
-      [viewWidth, viewHeight] = [viewHeight, viewWidth];
-    }
+    // 直接使用容器的实际尺寸（CSS 已经处理好了旋转后的尺寸）
+    const containerWidth = container.clientWidth;
+    const containerHeight = container.clientHeight;
 
     // 计算缩放比例：以短边为准
-    const scaleX = viewWidth / ORIGINAL_WIDTH;
-    const scaleY = viewHeight / ORIGINAL_HEIGHT;
+    const scaleX = containerWidth / ORIGINAL_WIDTH;
+    const scaleY = containerHeight / ORIGINAL_HEIGHT;
     currentScale = Math.min(scaleX, scaleY);
 
     // 应用图片尺寸
