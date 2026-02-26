@@ -70,8 +70,8 @@
       background-color: black;
       /*border: solid green 2px;*/
       position: absolute;
-      top: 17.5vh;
-      left: 15.8vw;
+      top: 189px;
+      left: 304px;
       z-index: 999;
       padding: 4px;
       margin: 0;
@@ -83,12 +83,12 @@
 
     #blackboard {
       box-sizing: border-box;
-      height: 27.6vh;
-      width: 59.2vw;
+      height: 298px;
+      width: 1136px;
       /*text-shadow:0 0 0 ghostwhite;*/
       position: absolute;
-      top: 28.8vh;
-      left: 36.5vw;
+      top: 311px;
+      left: 700px;
       z-index: 999;
       padding: 4px;
       margin: 0;
@@ -121,38 +121,24 @@
 
     #person {
       position: absolute;
-      width: 15.6vw;
-      max-width: 300px;
+      width: 300px;
       bottom: 0px;
-      left: -15.6vw;
-      animation: linear infinite;
-      animation-name: run;
-      animation-duration: 200s;
+      /*left: 1300px;*/
       -webkit-animation: linear infinite;
       -webkit-animation-name: run;
       -webkit-animation-duration: 200s;
       overflow:hidden;
     }
-    @keyframes run {
-      0% {
-        left: -15.6vw;
-      }
-      50% {
-        left: 100vw;
-      }
-      100% {
-        left: -15.6vw;
-      }
-    }
     @-webkit-keyframes run {
       0% {
-        left: -15.6vw;
+        left: 0;
       }
       50% {
-        left: 100vw;
+        left: 1620px;
+        /*left: calc(100% - 100px);*/
       }
       100% {
-        left: -15.6vw;
+        left: 0;
       }
     }
     #person:hover{
