@@ -1,0 +1,479 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=428,initial-scale=1.0,maximum-scale=1.0,user-scalable=no">
+<title>提醒事项</title>
+<style>
+*{margin:0;padding:0;box-sizing:border-box}
+:root{--p:#667eea;--p2:#764ba2;--bg:#f5f5f5;--c:#fff;--t:#333;--t2:#999;--t3:#bbb;--b:#f0f0f0;--b2:#f8f8f8;--ok:#27ae60;--no:#e74c3c;--w:#e67e22;--sh:0 1px 6px rgba(0,0,0,.06)}
+[data-theme=dark]{--p:#5B9FFF;--p2:#7AB5FF;--bg:#121212;--c:#1E1E1E;--t:#E0E0E0;--t2:#999;--t3:#666;--b:#333;--b2:#2C2C2C;--ok:#4CD964;--no:#FF453A;--w:#FF9F0A;--sh:0 2px 12px rgba(0,0,0,.3)}
+[data-theme=green]{--p:#34D399;--p2:#6EE7B7;--bg:#F0FDF4;--c:#fff;--t:#333;--t2:#999;--t3:#bbb;--b:#D1FAE5;--b2:#ECFDF5;--ok:#34D399;--no:#EE0A24;--w:#FF976A;--sh:0 2px 12px rgba(52,211,153,.08)}
+[data-theme=orange]{--p:#FDBA74;--p2:#FCD34D;--bg:#FFFBF0;--c:#fff;--t:#333;--t2:#999;--t3:#bbb;--b:#FEF3C7;--b2:#FFFBEB;--ok:#34D399;--no:#EE0A24;--w:#FDBA74;--sh:0 2px 12px rgba(253,186,116,.08)}
+[data-theme=pink]{--p:#F9A8D4;--p2:#FBCFE8;--bg:#FFF1F6;--c:#fff;--t:#333;--t2:#999;--t3:#bbb;--b:#FCE7F3;--b2:#FDF2F8;--ok:#34D399;--no:#EE0A24;--w:#FF976A;--sh:0 2px 12px rgba(249,168,212,.08)}
+html,body{width:428px;height:400px;font-family:-apple-system,BlinkMacSystemFont,'PingFang SC','Helvetica Neue',sans-serif;background:var(--bg);overflow:hidden;-webkit-font-smoothing:antialiased}
+.ctn{width:428px;height:400px;background:var(--bg);display:flex;flex-direction:column;overflow:hidden;position:relative}
+.hd{background:linear-gradient(135deg,var(--p),var(--p2));padding:12px 16px 10px;color:#fff;flex-shrink:0;position:relative}
+.hd h1{font-size:17px;font-weight:700;display:block;line-height:20px}
+.hd .sub{font-size:11px;opacity:.8;margin-top:2px}
+.hbtn{position:absolute;top:10px;width:28px;height:28px;border-radius:50%;border:none;background:rgba(255,255,255,.2);color:#fff;cursor:pointer;display:flex;align-items:center;justify-content:center;-webkit-tap-highlight-color:transparent;transition:all .15s}
+.hbtn:active{transform:scale(.9);background:rgba(255,255,255,.35)}
+.sb{right:46px;font-size:14px}
+.gb{right:12px;font-size:15px}
+.sdd{position:absolute;top:42px;right:12px;background:var(--bg);border-radius:10px;box-shadow:0 4px 20px rgba(0,0,0,.15);padding:6px;display:none;z-index:200;min-width:130px}
+.sdd.show{display:block}
+.si{display:flex;align-items:center;gap:8px;padding:8px 10px;border-radius:8px;font-size:13px;color:var(--t);cursor:pointer;transition:background .12s;white-space:nowrap}
+.si:active{background:rgba(0,0,0,.05)}
+.si.on{color:var(--p);font-weight:600;background:rgba(102,126,234,.08)}
+.sts{display:flex;gap:8px;margin-top:8px}
+.st{background:rgba(255,255,255,.2);border-radius:8px;padding:5px 0;font-size:11px;flex:1;text-align:center;cursor:pointer;-webkit-tap-highlight-color:transparent;transition:background .15s}
+.st b{font-size:15px;display:block;margin-top:1px;font-weight:700}
+.st.on{background:rgba(255,255,255,.45)}
+.lst{list-style:none;padding:6px 12px;flex:1;overflow-y:auto;-webkit-overflow-scrolling:touch}
+.lst::-webkit-scrollbar{display:none}
+/* 列表布局 */
+.it{display:flex;align-items:center;gap:10px;padding:10px 12px;background:var(--c);border-radius:10px;margin-bottom:6px;-webkit-tap-highlight-color:transparent}
+.it:active{background:var(--b2)}
+.ic{width:30px;height:30px;border-radius:7px;background:linear-gradient(135deg,var(--p),var(--p2));display:flex;align-items:center;justify-content:center;flex-shrink:0;font-size:13px}
+.ct{flex:1;min-width:0}
+.tx{font-size:13px;color:var(--t);overflow:hidden;text-overflow:ellipsis;white-space:nowrap;line-height:1.3}
+.tm{font-size:11px;color:var(--t2);margin-top:1px}
+.ar{color:var(--t3);font-size:13px;flex-shrink:0}
+/* 标签通用样式（原来是内联在每次渲染中的） */
+.tg{font-size:10px;padding:1px 5px;border-radius:8px;flex-shrink:0}
+.tg-rp{background:#fff3e0;color:#e08a3c}
+.tg-sr{background:#e8f4fd;color:#5ba3d9}
+.tg-ss{background:#eef0fb;color:var(--p)}
+.tg-sc{background:#eafaf1;color:var(--ok)}
+.tg-sd{background:#fdecea;color:var(--no)}
+/* 详情文本 */
+.dt{font-size:11px;color:var(--t2);margin-top:1px;overflow:hidden;text-overflow:ellipsis;white-space:nowrap}
+/* 右侧标签列 */
+.tgs{display:flex;flex-direction:column;gap:3px;align-items:flex-end;margin-left:auto;flex-shrink:0}
+/* 时间轴布局 */
+.tl-g{position:relative;padding-left:22px;margin-bottom:10px}
+.tl-g:before{content:'';position:absolute;left:6px;top:22px;bottom:0;width:2px;background:var(--b)}
+.tl-d{font-size:12px;font-weight:600;color:var(--p);padding:2px 0 6px;position:relative}
+.tl-d.today{color:var(--no)}
+.tl-d:before{content:'';position:absolute;left:-19px;top:5px;width:8px;height:8px;border-radius:50%;background:var(--p);border:2px solid var(--b2)}
+.tl-d.today:before{background:var(--no);border-color:#fde}
+.tl-it{display:flex;align-items:center;gap:8px;padding:7px 10px;background:var(--c);border-radius:8px;margin-bottom:5px;position:relative;-webkit-tap-highlight-color:transparent;border-left:3px solid transparent}
+.tl-it:active{background:var(--b2)}
+.tl-it.s-s{border-left-color:var(--p)}
+.tl-it.s-c{border-left-color:var(--ok);opacity:.7}
+.tl-it.s-d{border-left-color:var(--no);opacity:.5}
+.tl-it:before{content:'';position:absolute;left:-18px;top:12px;width:5px;height:5px;border-radius:50%;background:var(--t3)}
+.tl-tx{flex:1;font-size:13px;color:var(--t);overflow:hidden;text-overflow:ellipsis;white-space:nowrap}
+.tl-tm{font-size:11px;color:var(--t2);flex-shrink:0}
+/* 聚焦布局 */
+.fc-s{background:var(--c);border-radius:10px;padding:10px 12px;margin-bottom:8px;box-shadow:var(--sh)}
+.fc-h{display:flex;align-items:center;justify-content:space-between;margin-bottom:8px;padding-bottom:6px;border-bottom:1px solid var(--b)}
+.fc-t{font-size:14px;font-weight:600;color:var(--p)}
+.fc-n{font-size:11px;color:var(--t2)}
+.fc-it{display:flex;align-items:center;gap:8px;padding:7px 0;border-bottom:1px solid var(--b2);-webkit-tap-highlight-color:transparent}
+.fc-it:last-child{border-bottom:none}
+.fc-it:active{opacity:.7}
+.fc-ic{font-size:13px;flex-shrink:0}
+.fc-ct{flex:1;min-width:0}
+.fc-tx{font-size:13px;color:var(--t);overflow:hidden;text-overflow:ellipsis;white-space:nowrap}
+.fc-dt{font-size:11px;color:var(--w);margin-top:1px}
+.fc-cd{position:relative;padding:10px 14px;background:var(--c);border-radius:10px;margin-bottom:6px;box-shadow:0 1px 4px rgba(0,0,0,.04);cursor:pointer;-webkit-tap-highlight-color:transparent}
+.fc-cd:active{background:var(--b2)}
+.fc-cl{font-size:13px;color:var(--t2)}
+.fc-cc{font-size:12px;color:var(--t3);background:var(--bg);padding:2px 8px;border-radius:8px;float:right}
+.emp{text-align:center;padding:30px 20px;color:var(--t3)}
+.emp .ei{font-size:36px;margin-bottom:8px}
+.emp p{font-size:13px}
+.ft{padding:6px 16px;background:var(--bg);text-align:center;flex-shrink:0}
+.ft span{font-size:10px;color:var(--t3)}
+/* 弹窗 */
+.ov{position:absolute;top:0;left:0;width:100%;height:100%;background:rgba(0,0,0,.35);z-index:9998;display:flex;align-items:center;justify-content:center;opacity:0;animation:fi .15s ease forwards}
+.ov.rm{animation:fo .15s ease forwards}
+@keyframes fi{to{opacity:1}}
+@keyframes fo{to{opacity:0}}
+.tt{display:flex;flex-direction:column;background:var(--c);padding:16px 14px;border-radius:14px;box-shadow:0 8px 30px rgba(0,0,0,.18);font-size:13px;color:var(--t);width:320px;max-width:88%;max-height:340px}
+.tt-h{font-weight:600;font-size:15px;text-align:center;padding-bottom:8px;border-bottom:1px solid var(--b);overflow:hidden;text-overflow:ellipsis;white-space:nowrap;flex-shrink:0}
+.tt-b{flex:1;overflow-y:auto;padding:6px 0;-webkit-overflow-scrolling:touch}
+.tt-b::-webkit-scrollbar{display:none}
+.tt-r{display:flex;gap:6px;font-size:13px;color:var(--t2);line-height:1.5;padding:4px 0;border-bottom:1px solid var(--b2)}
+.tt-r:last-child{border-bottom:none}
+.tt-l{color:var(--t2);flex-shrink:0;width:62px;text-align:right}
+.tt-v{color:var(--t);word-break:break-all;flex:1}
+.st-s{color:var(--w);font-weight:500}
+.st-c{color:var(--ok);font-weight:500}
+.st-d{color:var(--no);font-weight:500}
+.tt-a{display:flex;gap:8px;padding:8px 0 4px;border-top:1px solid var(--b);flex-shrink:0}
+.tt-a button{flex:1;border:none;padding:8px 0;border-radius:8px;font-size:13px;font-weight:500;cursor:pointer;-webkit-tap-highlight-color:transparent;transition:opacity .15s}
+.tt-a button:active{opacity:.7}
+.bd{background:#eafaf1;color:var(--ok)}
+.bl{background:#fdecea;color:var(--no)}
+.br{background:#eef0fb;color:var(--p)}
+.tt-c{margin-top:4px;text-align:center;color:var(--p);font-size:14px;font-weight:500;padding:6px;border-radius:8px;-webkit-tap-highlight-color:transparent;flex-shrink:0}
+.tt-c:active{background:var(--b2)}
+/* 设置面板 */
+.sp-ov{position:absolute;top:0;left:0;width:100%;height:100%;background:rgba(0,0,0,.4);z-index:9999;opacity:0;pointer-events:none;transition:opacity .2s}
+.sp-ov.show{opacity:1;pointer-events:auto}
+.sp{position:absolute;left:0;bottom:0;width:100%;background:var(--c);border-radius:14px 14px 0 0;z-index:10000;max-height:85%;overflow-y:auto;-webkit-overflow-scrolling:touch;transform:translateY(100%);transition:transform .3s cubic-bezier(.4,0,.2,1)}
+.sp.show{transform:translateY(0)}
+.sp::-webkit-scrollbar{display:none}
+.sp-bar{text-align:center;padding:10px 0 2px}
+.sp-bar:before{content:'';display:inline-block;width:32px;height:4px;background:var(--t3);border-radius:2px}
+.sp-hd{display:flex;align-items:center;justify-content:space-between;padding:6px 16px 12px}
+.sp-hd span{font-size:15px;font-weight:600;color:var(--t)}
+.sp-hd button{border:none;background:none;font-size:20px;color:var(--t2);cursor:pointer;padding:2px 4px}
+.sp-sec{padding:0 16px 14px}
+.sp-lab{font-size:12px;font-weight:600;color:var(--t2);margin-bottom:8px;letter-spacing:.3px}
+.th-gr{display:flex;gap:8px;flex-wrap:wrap}
+.th-it{display:flex;flex-direction:column;align-items:center;gap:4px;cursor:pointer;padding:6px 8px;border-radius:8px;border:2px solid transparent;transition:all .15s;min-width:50px}
+.th-it.on{border-color:var(--p);background:var(--b2)}
+.th-it:active{transform:scale(.95)}
+.th-dot{width:24px;height:24px;border-radius:50%;border:2px solid rgba(0,0,0,.08)}
+.th-nm{font-size:10px;color:var(--t2)}
+.st-opts{display:flex;gap:6px;flex-wrap:wrap}
+.st-opt{flex:1;min-width:56px;padding:8px 4px;text-align:center;border-radius:8px;border:2px solid var(--b);cursor:pointer;transition:all .15s;background:var(--c)}
+.st-opt.on{border-color:var(--p);background:var(--b2)}
+.st-opt:active{transform:scale(.95)}
+.st-oi{font-size:18px;margin-bottom:2px}
+.st-on{font-size:11px;color:var(--t);font-weight:500}
+.fd-list{display:flex;flex-direction:column;gap:4px}
+.fd-row{display:flex;align-items:center;justify-content:space-between;padding:8px 10px;background:var(--bg);border-radius:6px}
+.fd-info{display:flex;align-items:center;gap:6px;font-size:13px;color:var(--t)}
+.fd-hint{font-size:10px;color:var(--t3);margin-left:2px}
+.tgl{width:38px;height:20px;border-radius:10px;background:var(--t3);position:relative;cursor:pointer;transition:background .2s;flex-shrink:0}
+.tgl.on{background:var(--p)}
+.tgl:after{content:'';position:absolute;top:2px;left:2px;width:16px;height:16px;border-radius:50%;background:#fff;transition:transform .2s;box-shadow:0 1px 2px rgba(0,0,0,.2)}
+.tgl.on:after{transform:translateX(18px)}
+.tgl.dis{opacity:.4;cursor:not-allowed}
+</style>
+</head>
+<body>
+<div class="ctn">
+<div class="hd">
+<h1>⏰ 提醒事项</h1>
+<button class="hbtn sb" id="sB" onclick="tS(event)">⇅</button>
+<div class="sdd" id="sD">
+<div class="si on" data-sort="alert_desc"><span>🕐⬇</span>提醒时间·降序</div>
+<div class="si" data-sort="alert_asc"><span>🕐⬆</span>提醒时间·升序</div>
+<div class="si" data-sort="create_desc"><span>✏️⬇</span>创建时间·降序</div>
+<div class="si" data-sort="create_asc"><span>✏️⬆</span>创建时间·升序</div>
+</div>
+<button class="hbtn gb" onclick="oSP()">⚙</button>
+<p class="sub" id="dt"></p>
+<div class="sts">
+<div class="st on" id="tb0" onclick="SW('scheduled')">待提醒<b>3</b></div>
+<div class="st" id="tb1" onclick="SW('completed')">已完成<b>91</b></div>
+<div class="st" id="tb2" onclick="SW('deleted')">已删除<b>16</b></div>
+</div>
+</div>
+<div class="lst" id="ls"></div>
+<div class="ft"><span>共 110 项 · 待提醒 3 · 已完成 91 · 已删除 16</span></div>
+<div class="sp-ov" id="spOv" onclick="cSP()"></div>
+<div class="sp" id="spP">
+<div class="sp-bar"></div>
+<div class="sp-hd"><span>⚙️ 个性化设置</span><button onclick="cSP()">✕</button></div>
+<div class="sp-sec">
+<div class="sp-lab">🎨 主题</div>
+<div class="th-gr" id="tG">
+<div class="th-it on" data-th="default"><div class="th-dot" style="background:#667eea"></div><span class="th-nm">默认蓝</span></div>
+<div class="th-it" data-th="dark"><div class="th-dot" style="background:#1A1A1A;border-color:#444"></div><span class="th-nm">暗夜黑</span></div>
+<div class="th-it" data-th="green"><div class="th-dot" style="background:#07C160"></div><span class="th-nm">清新绿</span></div>
+<div class="th-it" data-th="orange"><div class="th-dot" style="background:#FF8C1A"></div><span class="th-nm">暖橘</span></div>
+<div class="th-it" data-th="pink"><div class="th-dot" style="background:#FF6B81"></div><span class="th-nm">樱花粉</span></div>
+</div>
+</div>
+<div class="sp-sec">
+<div class="sp-lab">📐 布局模式</div>
+<div class="st-opts" id="lyO">
+<div class="st-opt on" data-ly="list"><div class="st-oi">📄</div><div class="st-on">列表</div></div>
+<div class="st-opt" data-ly="timeline"><div class="st-oi">📅</div><div class="st-on">时间轴</div></div>
+<div class="st-opt" data-ly="focus"><div class="st-oi">🎯</div><div class="st-on">聚焦</div></div>
+</div>
+<div class="st-opts" id="frO" style="display:none;margin-top:8px">
+<div class="st-opt on" data-fr="today"><div class="st-oi">📌</div><div class="st-on">今日</div></div>
+<div class="st-opt" data-fr="24h"><div class="st-oi">⏳</div><div class="st-on">24小时</div></div>
+<div class="st-opt" data-fr="week"><div class="st-oi">📅</div><div class="st-on">本周</div></div>
+</div>
+</div>
+<div class="sp-sec">
+<div class="sp-lab">👁 展示字段</div>
+<div class="fd-list" id="fL">
+<div class="fd-row"><div class="fd-info"><span>📌</span>提醒标题<span class="fd-hint">（始终展示）</span></div><div class="tgl on dis" data-fd="title"></div></div>
+<div class="fd-row"><div class="fd-info"><span>📝</span>任务详情</div><div class="tgl" data-fd="detail"></div></div>
+<div class="fd-row"><div class="fd-info"><span>⏰</span>提醒时间<span class="fd-hint">（含周期频率）</span></div><div class="tgl on" data-fd="alert_time"></div></div>
+<div class="fd-row"><div class="fd-info"><span>🔁</span>周期标记<span class="fd-hint">（周期/单次提醒）</span></div><div class="tgl on" data-fd="repeat"></div></div>
+<div class="fd-row"><div class="fd-info"><span>🏷</span>状态标签</div><div class="tgl on" data-fd="status_badge"></div></div>
+</div>
+</div>
+<div style="height:16px"></div>
+</div>
+</div>
+<script>
+var T=[{"id": "3xvQow", "s": "出去锻炼", "d": "", "at": "2026-03-30 19:34:00", "ts": 1774870440, "st": "completed", "rp": "", "rf": "", "ca": 1774870177, "coa": 0, "da": 0}, {"id": "0JtaKn", "s": "站起来活动一下并接杯水", "d": "", "at": "2026-03-30 19:35:00", "ts": 1774870500, "st": "completed", "rp": "", "rf": "", "ca": 1774870160, "coa": 0, "da": 0}, {"id": "3poa8s", "s": "无标题", "d": "", "at": "2026-03-30 19:36:00", "ts": 1774870560, "st": "completed", "rp": "", "rf": "", "ca": 1774870245, "coa": 0, "da": 0}, {"id": "33649t", "s": "无标题", "d": "", "at": "2026-03-30 19:37:00", "ts": 1774870620, "st": "completed", "rp": "", "rf": "", "ca": 1774870247, "coa": 0, "da": 0}, {"id": "3nydJD", "s": "cpp版本第4次测试，该删除，该回调", "d": "", "at": "2026-03-30 20:03:00", "ts": 1774872180, "st": "completed", "rp": "", "rf": "", "ca": 1774872052, "coa": 0, "da": 0}, {"id": "1T0D5S", "s": "cpp版本第14次测试，该回调", "d": "", "at": "2026-03-30 20:07:00", "ts": 1774872420, "st": "completed", "rp": "", "rf": "", "ca": 1774872297, "coa": 0, "da": 0}, {"id": "3Fhu3q", "s": "回家", "d": "", "at": "2026-03-30 20:20:00", "ts": 1774873200, "st": "completed", "rp": "", "rf": "", "ca": 1774870178, "coa": 0, "da": 0}, {"id": "2I3NWn", "s": "cpp版本第15次测试，该回调", "d": "", "at": "2026-03-30 23:12:00", "ts": 1774883520, "st": "completed", "rp": "", "rf": "", "ca": 1774883358, "coa": 0, "da": 0}, {"id": "0UlA7V", "s": "取一下外卖", "d": "", "at": "2026-03-31 12:00:00", "ts": 1774929600, "st": "completed", "rp": "", "rf": "", "ca": 1774927381, "coa": 0, "da": 0}, {"id": "1IDqTz", "s": "站起来活动下", "d": "", "at": "2026-03-31 18:16:00", "ts": 1774952160, "st": "completed", "rp": "", "rf": "", "ca": 1774951988, "coa": 0, "da": 0}, {"id": "1b2Jee", "s": "接水", "d": "", "at": "2026-03-31 18:20:00", "ts": 1774952400, "st": "completed", "rp": "", "rf": "", "ca": 1774952166, "coa": 0, "da": 0}, {"id": "1xo9qk", "s": "喝接的水", "d": "", "at": "2026-03-31 18:22:00", "ts": 1774952520, "st": "completed", "rp": "", "rf": "", "ca": 1774952168, "coa": 0, "da": 0}, {"id": "4yvSlc", "s": "买票", "d": "", "at": "2026-03-31 18:24:00", "ts": 1774952640, "st": "completed", "rp": "", "rf": "", "ca": 1774952254, "coa": 0, "da": 0}, {"id": "3sdaDn", "s": "开会", "d": "", "at": "2026-03-31 18:40:00", "ts": 1774953600, "st": "completed", "rp": "", "rf": "", "ca": 1774952482, "coa": 0, "da": 0}, {"id": "1iOOz0", "s": "买票", "d": "", "at": "2026-03-31 19:00:00", "ts": 1774954800, "st": "completed", "rp": "", "rf": "", "ca": 1774952233, "coa": 0, "da": 0}, {"id": "45HIB4", "s": "早点下班", "d": "", "at": "2026-03-31 20:00:00", "ts": 1774958400, "st": "completed", "rp": "", "rf": "", "ca": 1774949751, "coa": 0, "da": 0}, {"id": "21kOnj", "s": "检查bug", "d": "", "at": "2026-03-31 20:28:00", "ts": 1774960080, "st": "completed", "rp": "", "rf": "", "ca": 1774959977, "coa": 0, "da": 0}, {"id": "3j7eN8", "s": "上线", "d": "", "at": "2026-03-31 20:30:00", "ts": 1774960200, "st": "completed", "rp": "", "rf": "", "ca": 1774960035, "coa": 0, "da": 0}, {"id": "3shn2r", "s": "上线", "d": "", "at": "2026-03-31 20:32:00", "ts": 1774960320, "st": "completed", "rp": "", "rf": "", "ca": 1774960080, "coa": 0, "da": 0}, {"id": "3KaqVE", "s": "出去走走", "d": "", "at": "2026-03-31 20:42:00", "ts": 1774960920, "st": "completed", "rp": "", "rf": "", "ca": 1774960575, "coa": 0, "da": 0}, {"id": "4E7Azd", "s": "站起来活动", "d": "", "at": "2026-03-31 23:11:00", "ts": 1774969860, "st": "completed", "rp": "interval:3m", "rf": "interval:3m", "ca": 1774969635, "coa": 0, "da": 0}, {"id": "2RL1Nz", "s": "站起来一下", "d": "", "at": "2026-04-01 16:42:00", "ts": 1775032920, "st": "completed", "rp": "", "rf": "", "ca": 1775032756, "coa": 0, "da": 0}, {"id": "0jeQp9", "s": "出去一趟", "d": "", "at": "2026-04-01 17:00:00", "ts": 1775034000, "st": "completed", "rp": "", "rf": "", "ca": 1775032962, "coa": 0, "da": 0}, {"id": "0YkaTT", "s": "去接杯水喝", "d": "", "at": "2026-04-01 17:05:00", "ts": 1775034300, "st": "completed", "rp": "", "rf": "", "ca": 1775034215, "coa": 0, "da": 0}, {"id": "0PP2qn", "s": "下班", "d": "", "at": "2026-04-02 22:45:00", "ts": 1775141100, "st": "completed", "rp": "", "rf": "", "ca": 1775140899, "coa": 0, "da": 0}, {"id": "0Oh3RL", "s": "去体育馆", "d": "", "at": "2026-04-04 20:00:00", "ts": 1775304000, "st": "completed", "rp": "", "rf": "", "ca": 1775286481, "coa": 0, "da": 0}, {"id": "2thZfz", "s": "出去活动", "d": "", "at": "2026-04-05 15:00:00", "ts": 1775372400, "st": "completed", "rp": "", "rf": "", "ca": 1775358617, "coa": 0, "da": 0}, {"id": "064sBc", "s": "去体育馆", "d": "", "at": "2026-04-05 19:00:00", "ts": 1775386800, "st": "completed", "rp": "", "rf": "", "ca": 1775359744, "coa": 0, "da": 0}, {"id": "4dro0i", "s": "查bug", "d": "", "at": "2026-04-05 21:15:00", "ts": 1775394900, "st": "completed", "rp": "", "rf": "", "ca": 1775391846, "coa": 0, "da": 0}, {"id": "3QkXvB", "s": "下单", "d": "", "at": "2026-04-05 21:30:00", "ts": 1775395800, "st": "completed", "rp": "", "rf": "", "ca": 1775394599, "coa": 0, "da": 0}, {"id": "3HkGEn", "s": "买菜", "d": "", "at": "2026-04-06 09:00:00", "ts": 1775437200, "st": "completed", "rp": "", "rf": "", "ca": 1775404435, "coa": 0, "da": 0}, {"id": "09BJGw", "s": "骑车上班", "d": "", "at": "2026-04-07 08:00:00", "ts": 1775520000, "st": "completed", "rp": "", "rf": "", "ca": 1775401278, "coa": 0, "da": 0}, {"id": "1PoDLI", "s": "站起来活动", "d": "", "at": "2026-04-08 15:40:00", "ts": 1775634000, "st": "completed", "rp": "", "rf": "", "ca": 1775633670, "coa": 0, "da": 0}, {"id": "3t1gyZ", "s": "测试功能", "d": "", "at": "2026-04-08 16:33:00", "ts": 1775637180, "st": "completed", "rp": "", "rf": "", "ca": 1775637106, "coa": 0, "da": 0}, {"id": "3KTwS5", "s": "站起来活动", "d": "", "at": "2026-04-08 18:02:00", "ts": 1775642520, "st": "completed", "rp": "", "rf": "", "ca": 1775642366, "coa": 0, "da": 0}, {"id": "3mpFlj", "s": "接杯水", "d": "", "at": "2026-04-08 18:33:00", "ts": 1775644380, "st": "completed", "rp": "", "rf": "", "ca": 1775644131, "coa": 0, "da": 0}, {"id": "1iAZot", "s": "接杯水", "d": "", "at": "2026-04-08 18:43:00", "ts": 1775644980, "st": "completed", "rp": "", "rf": "", "ca": 1775644131, "coa": 0, "da": 0}, {"id": "0NjJZh", "s": "接杯水", "d": "", "at": "2026-04-08 18:58:00", "ts": 1775645880, "st": "completed", "rp": "", "rf": "", "ca": 1775644131, "coa": 0, "da": 0}, {"id": "2WTPNu", "s": "打车", "d": "", "at": "2026-04-08 21:30:00", "ts": 1775655000, "st": "completed", "rp": "", "rf": "", "ca": 1775642805, "coa": 0, "da": 0}, {"id": "1XvTOB", "s": "站起来", "d": "", "at": "2026-04-08 21:40:00", "ts": 1775655600, "st": "completed", "rp": "", "rf": "", "ca": 1775651840, "coa": 0, "da": 0}, {"id": "1ZH5DP", "s": "站起来", "d": "", "at": "2026-04-08 21:51:00", "ts": 1775656260, "st": "completed", "rp": "", "rf": "", "ca": 1775651846, "coa": 0, "da": 0}, {"id": "421mz3", "s": "站起来", "d": "", "at": "2026-04-08 21:51:00", "ts": 1775656260, "st": "completed", "rp": "", "rf": "", "ca": 1775656108, "coa": 0, "da": 0}, {"id": "2LQ4no", "s": "站起来", "d": "", "at": "2026-04-08 22:02:00", "ts": 1775656920, "st": "completed", "rp": "", "rf": "", "ca": 1775651851, "coa": 0, "da": 0}, {"id": "1ePB3l", "s": "接杯水", "d": "", "at": "2026-04-08 22:20:00", "ts": 1775658000, "st": "completed", "rp": "", "rf": "", "ca": 1775657180, "coa": 0, "da": 0}, {"id": "0V9bD6", "s": "打车下班", "d": "", "at": "2026-04-08 22:30:00", "ts": 1775658600, "st": "completed", "rp": "", "rf": "", "ca": 1775657140, "coa": 0, "da": 0}, {"id": "3ZSUW7", "s": "站起来", "d": "每隔12分钟提醒我站起来喝杯水", "at": "2026-04-09 00:37:00", "ts": 1775666220, "st": "deleted", "rp": "每12分钟", "rf": "每12分钟", "ca": 1775651857, "coa": 0, "da": 1775665529}, {"id": "4sXT3a", "s": "站起来", "d": "", "at": "2026-04-10 11:43:00", "ts": 1775792580, "st": "completed", "rp": "", "rf": "", "ca": 1775792478, "coa": 0, "da": 0}, {"id": "3u2G09", "s": "午休", "d": "", "at": "2026-04-10 13:29:00", "ts": 1775798940, "st": "completed", "rp": "", "rf": "", "ca": 1775798789, "coa": 0, "da": 0}, {"id": "3Ziril", "s": "查bug", "d": "", "at": "2026-04-10 14:00:00", "ts": 1775800800, "st": "completed", "rp": "", "rf": "", "ca": 1775798102, "coa": 0, "da": 0}, {"id": "1SJb9w", "s": "站起来", "d": "", "at": "2026-04-10 16:10:00", "ts": 1775808600, "st": "completed", "rp": "", "rf": "", "ca": 1775808528, "coa": 0, "da": 0}, {"id": "1HImpZ", "s": "喝水", "d": "", "at": "2026-04-10 16:51:00", "ts": 1775811060, "st": "completed", "rp": "", "rf": "", "ca": 1775810846, "coa": 0, "da": 0}, {"id": "3BV0QE", "s": "买菜", "d": "", "at": "2026-04-12 09:30:00", "ts": 1775957400, "st": "completed", "rp": "", "rf": "", "ca": 1775836806, "coa": 0, "da": 0}, {"id": "0LUm6B", "s": "开会", "d": "", "at": "2026-04-13 14:00:00", "ts": 1776060000, "st": "completed", "rp": "", "rf": "", "ca": 1775965802, "coa": 0, "da": 0}, {"id": "1bmjJS", "s": "站起来", "d": "", "at": "2026-04-13 14:01:00", "ts": 1776060060, "st": "completed", "rp": "", "rf": "", "ca": 1776059908, "coa": 0, "da": 0}, {"id": "2Mpbtk", "s": "带钥匙", "d": "", "at": "2026-04-13 20:00:00", "ts": 1776081600, "st": "deleted", "rp": "", "rf": "", "ca": 1775996787, "coa": 0, "da": 1776049065}, {"id": "16MBWh", "s": "睡觉", "d": "", "at": "2026-04-13 20:11:00", "ts": 1776082260, "st": "completed", "rp": "", "rf": "", "ca": 1776082126, "coa": 0, "da": 0}, {"id": "34yBDp", "s": "下班打车", "d": "", "at": "2026-04-13 21:31:00", "ts": 1776087060, "st": "completed", "rp": "", "rf": "", "ca": 1776086888, "coa": 0, "da": 0}, {"id": "3abwW9", "s": "带钥匙", "d": "出门带钥匙", "at": "2026-04-14 08:00:00", "ts": 1776124800, "st": "deleted", "rp": "", "rf": "", "ca": 1775978064, "coa": 0, "da": 1775982286}, {"id": "2fuLPc", "s": "AI资讯", "d": "每天8点推送一篇AI资讯", "at": "2026-04-14 08:00:00", "ts": 1776124800, "st": "deleted", "rp": "每天", "rf": "每天", "ca": 1776068965, "coa": 0, "da": 1776071070}, {"id": "4zrBZD", "s": "AI资讯", "d": "每天8点推送一篇AI资讯", "at": "2026-04-14 08:00:00", "ts": 1776124800, "st": "deleted", "rp": "每天", "rf": "每天", "ca": 1776069046, "coa": 0, "da": 1776071070}, {"id": "34SpPg", "s": "AI资讯", "d": "每天8点10分推送一篇AI资讯", "at": "2026-04-14 08:10:00", "ts": 1776125400, "st": "deleted", "rp": "每天", "rf": "每天", "ca": 1776070574, "coa": 0, "da": 1776071070}, {"id": "2uQqFw", "s": "上厕所", "d": "", "at": "2026-04-14 10:31:00", "ts": 1776133860, "st": "completed", "rp": "", "rf": "", "ca": 1776133717, "coa": 0, "da": 0}, {"id": "3cuHYc", "s": "检查日志", "d": "", "at": "2026-04-14 10:56:00", "ts": 1776135360, "st": "deleted", "rp": "每5分钟", "rf": "每5分钟", "ca": 1776133896, "coa": 0, "da": 1776135181}, {"id": "3JdQSq", "s": "AI资讯推荐", "d": "搜索并推荐一个最新的AI领域资讯，包含标题、简要内容和相关链接", "at": "2026-04-14 14:05:00", "ts": 1776146700, "st": "completed", "rp": "", "rf": "", "ca": 1776146397, "coa": 0, "da": 0}, {"id": "3o32hQ", "s": "推荐马拉松赛事", "d": "搜索并推荐最近的马拉松赛事信息，包括赛事名称、举办时间、地点和报名方式", "at": "2026-04-14 14:11:00", "ts": 1776147060, "st": "completed", "rp": "", "rf": "", "ca": 1776146863, "coa": 0, "da": 0}, {"id": "0bjgeC", "s": "搜索大事件", "d": "搜索最近有哪些大事件", "at": "2026-04-14 14:54:00", "ts": 1776149640, "st": "completed", "rp": "", "rf": "", "ca": 1776149365, "coa": 0, "da": 0}, {"id": "0IaHvE", "s": "搜索大事件", "d": "搜索最近发生的大事件，整理成简明摘要", "at": "2026-04-14 15:05:00", "ts": 1776150300, "st": "completed", "rp": "", "rf": "", "ca": 1776150042, "coa": 0, "da": 0}, {"id": "2Hpo2O", "s": "田径比赛推送", "d": "搜索最近有哪些田径比赛，包括比赛名称、时间、地点等信息", "at": "2026-04-14 16:10:00", "ts": 1776154200, "st": "completed", "rp": "", "rf": "", "ca": 1776154067, "coa": 0, "da": 0}, {"id": "1KE8c7", "s": "钻石联赛查询", "d": "搜索2026年4月、5月、6月份的钻石联赛赛程，列出比赛日期、地点，并说明重点比赛项目（如100米、200米、跳高、跳远等田径项目）", "at": "2026-04-14 16:20:00", "ts": 1776154800, "st": "completed", "rp": "", "rf": "", "ca": 1776154732, "coa": 0, "da": 0}, {"id": "460ArB", "s": "钻石联赛查询", "d": "搜索最近100米钻石联赛的比赛信息，包括比赛名称、时间、地点，以及参赛运动员名单", "at": "2026-04-14 16:45:00", "ts": 1776156300, "st": "completed", "rp": "", "rf": "", "ca": 1776156010, "coa": 0, "da": 0}, {"id": "2NS4EW", "s": "演唱会查询", "d": "查询最近北京有哪些演唱会，并将结果推送给用户", "at": "2026-04-14 17:31:00", "ts": 1776159060, "st": "completed", "rp": "", "rf": "", "ca": 1776158912, "coa": 0, "da": 0}, {"id": "3Rdpcq", "s": "搜索好玩的东西", "d": "搜索最近有哪些好玩的东西，整理成列表并发送给用户", "at": "2026-04-14 19:45:00", "ts": 1776167100, "st": "completed", "rp": "", "rf": "", "ca": 1776166878, "coa": 0, "da": 0}, {"id": "3Bb0aP", "s": "取快递", "d": "", "at": "2026-04-14 19:56:00", "ts": 1776167760, "st": "completed", "rp": "", "rf": "", "ca": 1776167587, "coa": 0, "da": 0}, {"id": "3tQira", "s": "站起来", "d": "", "at": "2026-04-14 20:35:00", "ts": 1776170100, "st": "deleted", "rp": "", "rf": "", "ca": 1776169796, "coa": 0, "da": 1776219769}, {"id": "0BgttT", "s": "站起来", "d": "", "at": "2026-04-14 20:38:00", "ts": 1776170280, "st": "deleted", "rp": "", "rf": "", "ca": 1776170135, "coa": 0, "da": 1776219774}, {"id": "1F4Ptz", "s": "喝水", "d": "", "at": "2026-04-14 20:39:00", "ts": 1776170340, "st": "completed", "rp": "", "rf": "", "ca": 1776170245, "coa": 0, "da": 0}, {"id": "4393sr", "s": "股价查询", "d": "查询腾讯当前股价并回复结果", "at": "2026-04-14 20:58:00", "ts": 1776171480, "st": "completed", "rp": "", "rf": "", "ca": 1776171329, "coa": 0, "da": 0}, {"id": "2rd4Wz", "s": "上厕所", "d": "", "at": "2026-04-14 21:06:00", "ts": 1776171960, "st": "completed", "rp": "", "rf": "", "ca": 1776171792, "coa": 0, "da": 0}, {"id": "48Z8Og", "s": "站起来", "d": "", "at": "2026-04-14 21:13:00", "ts": 1776172380, "st": "completed", "rp": "", "rf": "", "ca": 1776172260, "coa": 0, "da": 0}, {"id": "2Tlcdo", "s": "吃饭", "d": "", "at": "2026-04-14 21:24:00", "ts": 1776173040, "st": "completed", "rp": "", "rf": "", "ca": 1776172770, "coa": 0, "da": 0}, {"id": "02XWU8", "s": "打车", "d": "", "at": "2026-04-14 21:30:00", "ts": 1776173400, "st": "completed", "rp": "", "rf": "", "ca": 1776166839, "coa": 0, "da": 0}, {"id": "3pcV6Z", "s": "活动下", "d": "", "at": "2026-04-14 21:40:00", "ts": 1776174000, "st": "completed", "rp": "", "rf": "", "ca": 1776172380, "coa": 0, "da": 0}, {"id": "4sAcOo", "s": "发早安", "d": "", "at": "2026-04-15 08:20:00", "ts": 1776212400, "st": "deleted", "rp": "每天", "rf": "每天", "ca": 1776070735, "coa": 0, "da": 1776156088}, {"id": "4sScxt", "s": "开会", "d": "", "at": "2026-04-15 10:00:00", "ts": 1776218400, "st": "completed", "rp": "", "rf": "", "ca": 1775981816, "coa": 0, "da": 0}, {"id": "1Ie5Gv", "s": "站起来", "d": "", "at": "2026-04-15 10:42:00", "ts": 1776220920, "st": "completed", "rp": "", "rf": "", "ca": 1776220788, "coa": 0, "da": 0}, {"id": "3eN5kq", "s": "测试提醒", "d": "测试提醒功能是否正常", "at": "2026-04-15 10:50:00", "ts": 1776221400, "st": "completed", "rp": "", "rf": "", "ca": 1776221271, "coa": 0, "da": 0}, {"id": "0JmdTX", "s": "腾讯股价查询", "d": "查询腾讯当前股价，并将结果发送给用户", "at": "2026-04-15 10:53:00", "ts": 1776221580, "st": "completed", "rp": "", "rf": "", "ca": 1776221317, "coa": 0, "da": 0}, {"id": "1myEV4", "s": "测试消息", "d": "2分钟后提醒用户测试消息发送", "at": "2026-04-15 11:08:00", "ts": 1776222480, "st": "completed", "rp": "", "rf": "", "ca": 1776222370, "coa": 0, "da": 0}, {"id": "48OG1f", "s": "站起来", "d": "", "at": "2026-04-15 11:23:00", "ts": 1776223380, "st": "completed", "rp": "", "rf": "", "ca": 1776223315, "coa": 0, "da": 0}, {"id": "2RKhnC", "s": "喝水", "d": "", "at": "2026-04-15 11:53:00", "ts": 1776225180, "st": "completed", "rp": "", "rf": "", "ca": 1776225049, "coa": 0, "da": 0}, {"id": "3QOteF", "s": "取快递", "d": "", "at": "2026-04-15 12:00:00", "ts": 1776225600, "st": "completed", "rp": "", "rf": "", "ca": 1776221231, "coa": 0, "da": 0}, {"id": "1jXx3n", "s": "上厕所", "d": "", "at": "2026-04-15 12:44:00", "ts": 1776228240, "st": "completed", "rp": "", "rf": "", "ca": 1776228104, "coa": 0, "da": 0}, {"id": "2AyKLV", "s": "开会", "d": "", "at": "2026-04-15 13:30:00", "ts": 1776231000, "st": "completed", "rp": "", "rf": "", "ca": 1776223758, "coa": 0, "da": 0}, {"id": "1fADjX", "s": "AI资讯", "d": "搜索最新的AI领域资讯，包括标题和链接，生成简明摘要", "at": "2026-04-15 14:03:00", "ts": 1776232980, "st": "deleted", "rp": "每天", "rf": "每天", "ca": 1776146262, "coa": 0, "da": 1776146352}, {"id": "0GzJar", "s": "股价查询", "d": "搜索腾讯股价并发送结果给用户", "at": "2026-04-15 14:13:00", "ts": 1776233580, "st": "completed", "rp": "", "rf": "", "ca": 1776233428, "coa": 0, "da": 0}, {"id": "4h9fhP", "s": "看快递详情", "d": "", "at": "2026-04-15 15:00:00", "ts": 1776236400, "st": "completed", "rp": "", "rf": "", "ca": 1776233380, "coa": 0, "da": 0}, {"id": "0JyRBi", "s": "上厕所", "d": "", "at": "2026-04-15 16:41:00", "ts": 1776242460, "st": "completed", "rp": "", "rf": "", "ca": 1776242021, "coa": 0, "da": 0}, {"id": "4uRbcL", "s": "喝水", "d": "", "at": "2026-04-15 16:49:00", "ts": 1776242940, "st": "completed", "rp": "", "rf": "", "ca": 1776242681, "coa": 0, "da": 0}, {"id": "327MD2", "s": "站起来活动", "d": "", "at": "2026-04-15 16:56:00", "ts": 1776243360, "st": "completed", "rp": "", "rf": "", "ca": 1776243076, "coa": 0, "da": 0}, {"id": "0UDbE1", "s": "股价查询", "d": "查询腾讯最新的股价信息，并将结果发送给用户", "at": "2026-04-15 18:57:00", "ts": 1776250620, "st": "deleted", "rp": "每20分钟", "rf": "每20分钟", "ca": 1776233873, "coa": 0, "da": 1776249472}, {"id": "1qxSdT", "s": "站起来", "d": "", "at": "2026-04-15 19:25:00", "ts": 1776252300, "st": "completed", "rp": "", "rf": "", "ca": 1776252180, "coa": 0, "da": 0}, {"id": "3gOzZb", "s": "检查tablekv上线情况", "d": "", "at": "2026-04-15 20:00:00", "ts": 1776254400, "st": "completed", "rp": "", "rf": "", "ca": 1776250893, "coa": 0, "da": 0}, {"id": "3DbCI8", "s": "取电动车", "d": "", "at": "2026-04-15 21:50:00", "ts": 1776261000, "st": "completed", "rp": "", "rf": "", "ca": 1776233188, "coa": 0, "da": 0}, {"id": "4BGLwR", "s": "打车", "d": "", "at": "2026-04-15 22:10:00", "ts": 1776262200, "st": "scheduled", "rp": "", "rf": "", "ca": 1776261640, "coa": 0, "da": 0}, {"id": "08LSxt", "s": "喝水打卡", "d": "每天早上9点提醒喝水打卡", "at": "2026-04-16 09:00:00", "ts": 1776301200, "st": "scheduled", "rp": "每天", "rf": "每天", "ca": 1776234064, "coa": 0, "da": 0}, {"id": "4xwEVV", "s": "买菜", "d": "", "at": "2026-04-18 09:30:00", "ts": 1776475800, "st": "scheduled", "rp": "", "rf": "", "ca": 1775985287, "coa": 0, "da": 0}, {"id": "46JfZG", "s": "祝张彦潇生日快乐", "d": "张彦潇的生日是农历五月初十，对应公历2026年6月24日。提醒我祝他生日快乐。", "at": "2026-06-24 09:00:00", "ts": 1782262800, "st": "deleted", "rp": "", "rf": "", "ca": 1775747363, "coa": 0, "da": 1775835494}, {"id": "4c8Dbm", "s": "祝张彦潇生日快乐", "d": "每年农历五月初十提醒我祝张彦潇生日快乐", "at": "2026-06-24 09:00:00", "ts": 1782262800, "st": "deleted", "rp": "每年农历五月初十", "rf": "每年农历五月初十", "ca": 1775817643, "coa": 0, "da": 1775835494}, {"id": "4iAmWo", "s": "祝李娇娇生日快乐", "d": "每年10月2日提醒祝李娇娇生日快乐", "at": "2026-10-02 09:00:00", "ts": 1790902800, "st": "deleted", "rp": "每年", "rf": "每年", "ca": 1775817643, "coa": 0, "da": 1775835494}, {"id": "0U3f62", "s": "祝单延滨生日快乐", "d": "", "at": "2026-12-21 09:00:00", "ts": 1797814800, "st": "deleted", "rp": "每年", "rf": "每年", "ca": 1775817642, "coa": 0, "da": 1775835494}],F='scheduled',V='list';
+var VF={title:1,detail:0,alert_time:1,repeat:1,status_badge:1};
+var SO='alert_desc',FR='today';
+/* 工具函数 */
+function $(i){return document.getElementById(i)}
+function Q(s){return document.querySelectorAll(s)}
+/* 状态文本映射（Python端已对show_content做了escape，JS端不再需要esc） */
+var SM={'scheduled':'待提醒','completed':'已完成','deleted':'已删除'};
+function stx(s){return SM[s]||s||'未知'}
+/* 日期工具 */
+function dk(ts){if(!ts)return'';var d=new Date(ts*1000);return d.getFullYear()+'-'+P(d.getMonth()+1)+'-'+P(d.getDate())}
+function P(n){return n<10?'0'+n:''+n}
+function td(){var n=new Date();return n.getFullYear()+'-'+P(n.getMonth()+1)+'-'+P(n.getDate())}
+function dl(k){var p=k.split('-'),d=new Date(+p[0],+p[1]-1,+p[2]),now=new Date(),t=td(),wd=['周日','周一','周二','周三','周四','周五','周六'];if(k===t)return'📌 今天 '+p[1]+'-'+p[2];var tmr=new Date(now.getTime()+864e5),ts2=tmr.getFullYear()+'-'+P(tmr.getMonth()+1)+'-'+P(tmr.getDate());if(k===ts2)return'明天 '+p[1]+'-'+p[2];return p[1]+'-'+p[2]+' '+wd[d.getDay()]}
+function cd(ts){if(!ts)return'';var df=ts*1000-Date.now();if(df<0)return'已过期';var h=Math.floor(df/36e5),m=Math.floor((df%36e5)/6e4);if(h>24)return Math.floor(h/24)+'天后';if(h>0)return h+'小时'+(m>0?m+'分':'')+'后';return m+'分钟后'}
+function fmt(ts){if(!ts)return'';var d=new Date(ts*1000);return d.getFullYear()+'-'+P(d.getMonth()+1)+'-'+P(d.getDate())+' '+P(d.getHours())+':'+P(d.getMinutes())+':'+P(d.getSeconds())}
+/* 公共标签渲染函数——将原来6处重复的内联样式统一 */
+function mkTags(t){
+var h='';
+if(VF.repeat)h+='<span class="tg '+(t.rp?'tg-rp':'tg-sr')+'">'+(t.rp?'周期提醒':'单次提醒')+'</span>';
+if(VF.status_badge)h+='<span class="tg '+(t.st==='scheduled'?'tg-ss':t.st==='completed'?'tg-sc':'tg-sd')+'">'+stx(t.st)+'</span>';
+return h?'<div class="tgs">'+h+'</div>':''
+}
+/* 公共详情行 */
+function mkDet(t){return VF.detail&&t.d?'<div class="dt">'+t.d+'</div>':''}
+/* 公共时间+周期元信息 */
+function mkMeta(t,short){
+if(!VF.alert_time)return'';
+var m=short?(t.at||'').slice(11,16):(t.at||'未设置时间');
+if(t.rp)m+='（'+t.rp+'）';
+return m
+}
+/* 设置面板 */
+function oSP(){$('spOv').classList.add('show');$('spP').classList.add('show')}
+function cSP(){$('spOv').classList.remove('show');$('spP').classList.remove('show')}
+/* 主题切换 */
+(function(){
+var G={default:'linear-gradient(135deg,#667eea,#764ba2)',dark:'linear-gradient(135deg,#2C3E50,#4CA1AF)',green:'linear-gradient(135deg,#34D399,#6EE7B7)',orange:'linear-gradient(135deg,#FDBA74,#FCD34D)',pink:'linear-gradient(135deg,#F9A8D4,#FBCFE8)'};
+var its=Q('.th-it');
+for(var i=0;i<its.length;i++)its[i].onclick=(function(el){return function(){
+var th=el.getAttribute('data-th');
+document.documentElement.setAttribute('data-theme',th==='default'?'':th);
+for(var j=0;j<its.length;j++)its[j].className='th-it';
+el.className='th-it on';
+document.querySelector('.hd').style.background=G[th]||G.default
+}})( its[i])
+})();
+/* 布局切换 */
+(function(){
+var os=Q('#lyO .st-opt'),fs=$('frO');
+for(var i=0;i<os.length;i++)os[i].onclick=(function(el){return function(){
+var ly=el.getAttribute('data-ly');
+for(var j=0;j<os.length;j++)os[j].className='st-opt';
+el.className='st-opt on';
+fs.style.display=ly==='focus'?'flex':'none';
+SV(ly)
+}})( os[i])
+})();
+/* 字段开关 */
+(function(){
+var ts=Q('.tgl[data-fd]');
+for(var i=0;i<ts.length;i++)ts[i].onclick=(function(el){return function(){
+if(el.classList.contains('dis'))return;
+var fd=el.getAttribute('data-fd');
+VF[fd]=VF[fd]?0:1;
+el.classList.toggle('on',!!VF[fd]);
+render()
+}})( ts[i])
+})();
+/* 排序下拉 */
+function tS(e){e.stopPropagation();$('sD').classList.toggle('show')}
+(function(){
+var dd=$('sD'),its=dd.querySelectorAll('.si');
+for(var i=0;i<its.length;i++)its[i].onclick=(function(el){return function(e){
+e.stopPropagation();
+SO=el.getAttribute('data-sort');
+for(var j=0;j<its.length;j++)its[j].className='si';
+el.className='si on';
+dd.classList.remove('show');
+render()
+}})( its[i]);
+document.addEventListener('click',function(){dd.classList.remove('show')})
+})();
+/* 聚焦范围 */
+(function(){
+var os=Q('#frO .st-opt');
+for(var i=0;i<os.length;i++)os[i].onclick=(function(el){return function(){
+FR=el.getAttribute('data-fr');
+for(var j=0;j<os.length;j++)os[j].className='st-opt';
+el.className='st-opt on';
+render()
+}})( os[i])
+})();
+/* 排序 */
+function srt(a){
+var r=a.slice(),p=SO.split('_'),fd=p[0]==='alert'?'ts':'ca',dr=p[p.length-1];
+r.sort(function(x,y){var xv=x[fd]||0,yv=y[fd]||0;return dr==='asc'?xv-yv:yv-xv});
+return r
+}
+/* 空状态 */
+function empH(){
+var ic,tx;
+if(V!=='list'){ic='📭';tx='暂无提醒事项'}
+else if(F==='scheduled'){ic='📭';tx='暂无待提醒事项'}
+else if(F==='completed'){ic='🎉';tx='暂无已完成事项'}
+else{ic='🚫';tx='暂无已删除事项'}
+return'<div class="emp"><div class="ei">'+ic+'</div><p>'+tx+'</p></div>'
+}
+/* 列表渲染 */
+function rL(list){
+if(!list.length)return empH();
+return list.map(function(t){
+var idx=T.indexOf(t),icon=t.st==='scheduled'?'⏰':t.st==='completed'?'✅':'🚫';
+return'<div class="it" id="d-'+dk(t.ts)+'-'+idx+'" data-date="'+dk(t.ts)+'" onclick="SD('+idx+')"><div class="ic">'+icon+'</div><div class="ct"><div class="tx">'+t.s+'</div>'+mkDet(t)+'<div class="tm">'+mkMeta(t)+'</div></div>'+mkTags(t)+'<div class="ar">›</div></div>'
+}).join('')
+}
+/* 时间轴渲染 */
+function rT(list){
+if(!list.length)return empH();
+var g={},o=[];
+list.forEach(function(t){var k=dk(t.ts);if(!g[k]){g[k]=[];o.push(k)};g[k].push(t)});
+o.sort();
+return o.map(function(k){
+var items=g[k],ty=k===td();
+return'<div class="tl-g" id="d-'+k+'"><div class="tl-d'+(ty?' today':'')+'">'+dl(k)+' <span style="font-weight:400;color:#bbb;font-size:11px">('+items.length+')</span></div>'+items.map(function(t){
+var idx=T.indexOf(t),sc=t.st==='scheduled'?'s-s':t.st==='completed'?'s-c':'s-d';
+return'<div class="tl-it '+sc+'" onclick="SD('+idx+')"><div style="flex:1;min-width:0"><div class="tl-tx">'+t.s+'</div>'+mkDet(t)+'</div>'+(VF.alert_time?'<span class="tl-tm">'+mkMeta(t,1)+'</span>':'')+mkTags(t)+'</div>'
+}).join('')+'</div>'
+}).join('')
+}
+/* 聚焦渲染——只展示待提醒(scheduled)任务 */
+function rF(list){
+/* 聚焦模式只关注待提醒任务 */
+var sl=list.filter(function(t){return t.st==='scheduled'});
+if(!sl.length)return'<div class="emp"><div class="ei">🎉</div><p>所有事项都已完成，暂无待提醒</p></div>';
+var now=new Date(),tdy=td(),foc=[],rest=[];
+if(FR==='today'){
+sl.forEach(function(t){(dk(t.ts)===tdy?foc:rest).push(t)})
+}else if(FR==='24h'){
+var nw=Date.now(),ct=nw+864e5;
+sl.forEach(function(t){var ms=(t.ts||0)*1000;(ms>=nw&&ms<=ct?foc:rest).push(t)})
+}else{
+var dow=now.getDay()||7,ws=new Date(now);ws.setDate(now.getDate()-dow+1);ws.setHours(0,0,0,0);
+var we=new Date(ws);we.setDate(ws.getDate()+7);
+sl.forEach(function(t){var d=new Date((t.ts||0)*1000);(d>=ws&&d<we?foc:rest).push(t)})
+}
+var fl=FR==='today'?'📌 今天':FR==='24h'?'⏳ 未来24小时':'📅 本周';
+var h='<div class="fc-s"><div class="fc-h"><span class="fc-t">'+fl+'</span><span class="fc-n">'+foc.length+' 项</span></div>';
+if(foc.length){
+h+=foc.map(function(t){
+var idx=T.indexOf(t);
+var meta='';
+if(VF.alert_time){meta+=cd(t.ts);if(t.rp)meta+='（'+t.rp+'）'}
+return'<div class="fc-it" onclick="SD('+idx+')"><span class="fc-ic">⏰</span><div class="fc-ct"><div class="fc-tx">'+t.s+'</div>'+mkDet(t)+'<div class="fc-dt">'+meta+'</div></div>'+mkTags(t)+'</div>'
+}).join('')
+}else{
+h+='<div style="text-align:center;padding:12px;color:#bbb;font-size:13px">🎉 当前时段暂无待提醒事项</div>'
+}
+h+='</div>';
+if(rest.length){
+var rg={},ro=[];
+rest.forEach(function(t){var k=dk(t.ts);if(!rg[k]){rg[k]=[];ro.push(k)};rg[k].push(t)});
+ro.sort();
+h+='<div style="padding:6px 0 4px;font-size:12px;font-weight:600;color:var(--t2)">📋 其他日期待提醒</div>';
+ro.forEach(function(k){
+h+='<div class="fc-cd" onclick="TG(this)"><span class="fc-cl">▸ '+dl(k)+'</span><span class="fc-cc">'+rg[k].length+'</span></div>';
+h+='<div style="display:none">';
+h+=rg[k].map(function(t){
+var idx=T.indexOf(t);
+return'<div class="it" onclick="SD('+idx+')"><div class="ic">⏰</div><div class="ct"><div class="tx">'+t.s+'</div>'+mkDet(t)+'<div class="tm">'+mkMeta(t)+'</div></div>'+mkTags(t)+'<div class="ar">›</div></div>'
+}).join('');
+h+='</div>'
+})
+}
+return h
+}
+function TG(el){var n=el.nextElementSibling;if(n)n.style.display=n.style.display==='none'?'block':'none'}
+/* 滚动到今天（或离今天最近的日期）*/
+function scT(){
+var ls=$('ls');if(!ls)return;
+var t=td();
+var el=document.getElementById('d-'+t);
+if(!el){
+var all=ls.querySelectorAll('[id^="d-"]');
+var best=null,bd=Infinity,now=new Date(t+'T00:00:00').getTime();
+for(var i=0;i<all.length;i++){
+var id=all[i].id,dateStr=id.replace(/^d-/,'').replace(/-\d+$/,'');
+if(!/^\d{4}-\d{2}-\d{2}$/.test(dateStr))continue;
+var df=Math.abs(new Date(dateStr+'T00:00:00').getTime()-now);
+if(df<bd){bd=df;best=all[i]}
+}
+el=best
+}
+if(el){
+var off=el.offsetTop-ls.offsetTop;
+ls.scrollTop=Math.max(0,off-ls.clientHeight/2+el.clientHeight/2)
+}
+}
+/* 主渲染入口 */
+function render(scroll){
+var ls=$('ls'),sts=document.querySelector('.sts');
+if(V==='list'){sts.style.display='flex';ls.innerHTML=rL(srt(T.filter(function(t){return t.st===F})))}
+else{sts.style.display='none';var all=srt(T);ls.innerHTML=V==='timeline'?rT(all):rF(all)}
+if(scroll!==false)requestAnimationFrame(function(){setTimeout(scT,50)})
+}
+function SW(f){
+F=f;var ts=Q('.st');
+for(var i=0;i<ts.length;i++)ts[i].className='st';
+$(f==='scheduled'?'tb0':f==='completed'?'tb1':'tb2').className='st on';
+render(false)
+}
+function SV(v){
+V=v;var os=Q('#lyO .st-opt');
+for(var j=0;j<os.length;j++)os[j].classList.toggle('on',os[j].getAttribute('data-ly')===v);
+render()
+}
+/* 详情弹窗 */
+function SD(i){
+var t=T[i],r='';
+r+='<div class="tt-r"><span class="tt-l">提醒事件</span><span class="tt-v">'+t.s+'</span></div>';
+r+='<div class="tt-r"><span class="tt-l">提醒时间</span><span class="tt-v">'+(t.at||'未设置')+'</span></div>';
+if(t.d)r+='<div class="tt-r"><span class="tt-l">任务详情</span><span class="tt-v">'+t.d+'</span></div>';
+r+='<div class="tt-r"><span class="tt-l">周期频率</span><span class="tt-v">'+(t.rf||'单次提醒')+'</span></div>';
+r+='<div class="tt-r"><span class="tt-l">当前状态</span><span class="tt-v st-'+(t.st==='scheduled'?'s':t.st==='completed'?'c':'d')+'">'+stx(t.st)+'</span></div>';
+r+='<div class="tt-r"><span class="tt-l">创建时间</span><span class="tt-v">'+(fmt(t.ca)||'未知')+'</span></div>';
+if(t.st==='completed'&&t.coa)r+='<div class="tt-r"><span class="tt-l">完成时间</span><span class="tt-v">'+fmt(t.coa)+'</span></div>';
+if(t.st==='deleted'&&t.da)r+='<div class="tt-r"><span class="tt-l">删除时间</span><span class="tt-v">'+fmt(t.da)+'</span></div>';
+var ov=document.createElement('div');ov.className='ov';ov.id='curOv';
+ov.innerHTML='<div class="tt"><div class="tt-h">📌 '+t.s+'</div><div class="tt-b">'+r+'</div><div class="tt-a" id="tB"></div><div class="tt-c" id="tC">关闭</div></div>';
+document.body.appendChild(ov);
+var ba=$('tB');
+if(t.st==='scheduled'){
+aB(ba,'bd','✅ 标记完成',function(){ACT(i,'completed')});
+aB(ba,'bl','🚫 删除',function(){ACT(i,'deleted')})
+}else if(t.st==='completed'){
+aB(ba,'bl','🚫 删除',function(){ACT(i,'deleted')})
+}else if(t.st==='deleted'){
+aB(ba,'br','⏰ 恢复提醒',function(){ACT(i,'scheduled')});
+aB(ba,'bd','✅ 标记完成',function(){ACT(i,'completed')})
+}
+$('tC').onclick=CLO;
+ov.onclick=function(e){if(e.target===ov)CLO()}
+}
+function aB(p,c,tx,fn){var b=document.createElement('button');b.className=c;b.innerHTML=tx;b.onclick=fn;p.appendChild(b)}
+function CLO(){var ov=$('curOv');if(ov){ov.className='ov rm';setTimeout(function(){ov.remove()},150)}}
+function ACT(i,ns){
+var t=T[i],now=Math.floor(Date.now()/1000);
+t.st=ns;
+if(ns==='completed')t.coa=now;
+if(ns==='deleted')t.da=now;
+UC();CLO();render()
+}
+function UC(){
+var s=0,c=0,d=0;
+T.forEach(function(t){if(t.st==='scheduled')s++;else if(t.st==='completed')c++;else if(t.st==='deleted')d++});
+document.querySelector('#tb0 b').textContent=s;
+document.querySelector('#tb1 b').textContent=c;
+document.querySelector('#tb2 b').textContent=d;
+document.querySelector('.ft span').textContent='共 '+T.length+' 项 · 待提醒 '+s+' · 已完成 '+c+' · 已删除 '+d
+}
+/* 初始化 */
+(function(){
+var d=new Date(),o={year:'numeric',month:'long',day:'numeric',weekday:'long'};
+$('dt').textContent=d.toLocaleDateString('zh-CN',o);
+render()
+})();
+</script>
+</body>
+</html>
